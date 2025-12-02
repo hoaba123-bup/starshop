@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  --bg-base: #f8fafc;
+  --text-base: #0f172a;
+  --panel-bg: #ffffff;
+  --panel-text: #0f172a;
+  --border-color: #e2e8f0;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --bg-base: #0f172a;
+  --text-base: #e2e8f0;
+  --panel-bg: #1e293b;
+  --panel-text: #f8fafc;
+  --border-color: #475569;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-base);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+body a {
+  text-decoration: none;
+  color: inherit;
+}
+
+:root.dark .bg-white,
+:root.dark .bg-slate-50,
+:root.dark .bg-slate-100 {
+  background-color: var(--panel-bg) !important;
+  color: var(--panel-text) !important;
+}
+
+:root.dark .border-slate-200,
+:root.dark .border-slate-100 {
+  border-color: var(--border-color) !important;
+}
+
+:root.dark .text-slate-800,
+:root.dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+:root.dark .text-slate-600,
+:root.dark .text-slate-500 {
+  color: #cbd5f5 !important;
+}
+
+:root.dark .text-indigo-600,
+:root.dark .text-blue-600 {
+  color: #c7d2fe !important;
+}
+
+:root.dark .text-emerald-600 {
+  color: #6ee7b7 !important;
+}
+
+:root.dark .text-amber-600 {
+  color: #fde68a !important;
+}
+
+:root.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
