@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import PaymentResult from "./pages/user/components/PaymentResult";
 // User area
 import UserLayout from "./pages/user/layouts/UserLayout";
 import Home from "./pages/user/Home";
@@ -11,7 +11,7 @@ import SignUp from "./pages/user/auth/SignUp";
 import Profile from "./pages/user/profile/Profile";
 import UserOrders from "./pages/user/profile/Orders";
 import ProtectedRoute from "./pages/user/components/ProtectedRoute";
-
+import VnPayReturn from "./pages/user/VnPayReturn";
 // Admin area
 import AdminLayout from "./pages/admin/layouts/AdminLayout";
 import AdminLogin from "./pages/admin/auth/Login";
@@ -29,6 +29,7 @@ export default function RouterSetup() {
         <Route
           index
           element={
+
             <ProtectedRoute>
               <Home />
             </ProtectedRoute>
@@ -71,6 +72,22 @@ export default function RouterSetup() {
           element={
             <ProtectedRoute>
               <UserOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment/result" 
+          element={
+            <ProtectedRoute>
+              <PaymentResult /> 
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment/vnpay_return" // <--- THÊM ROUTE NÀY
+          element={
+            <ProtectedRoute>
+              <VnPayReturn /> 
             </ProtectedRoute>
           }
         />

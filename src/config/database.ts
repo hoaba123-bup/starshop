@@ -3,8 +3,8 @@ import mysql from 'mysql2/promise';
 export const pool = mysql.createPool({
   host: 'localhost',      // Địa chỉ MySQL server
   user: 'root',           // Username MySQL
-  password: '0605',       // Mật khẩu MySQL
-  database: 'StarShop',   // Tên database
+  password: '',       // Mật khẩu MySQL
+  database: 'starShop',   // Tên database
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

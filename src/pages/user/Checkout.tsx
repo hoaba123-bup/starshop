@@ -2,17 +2,24 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartItem, cartTotal, clearCart, getCart } from "../../utils/cart";
 import { OrderApi } from "../../apis/order.api";
-
+import { toast } from "react-toastify";
 export default function Checkout() {
   const navigate = useNavigate();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [form, setForm] = useState({
+const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     address: "",
-    payment: "cod" as "cod" | "bank",
+    // THAY THẾ 'bank' bằng 'vnpay'
+    payment: "cod" as "cod" | "vnpay", 
+    notes: "",
   });
+  const PAYMENT_METHODS = {
+    COD: 'Thanh toán khi nhận hàng (COD)',
+    // XÓA PAYOS: 'Ví điện tử & Thẻ ngân hàng (PayOS)',
+    VNPAY: 'Thẻ ATM & Visa/Mastercard (VNPAY)', // GIỮ LẠI
+};
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +31,7 @@ export default function Checkout() {
   const total = cartTotal(cart);
 
   const handleChange = (field: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value as "cod" | "vnpay" })); 
   };
 
   const validate = () => {
@@ -33,46 +40,89 @@ export default function Checkout() {
     if (!/^\d{9,11}$/.test(form.phone)) errs.push("So dien thoai 9-11 chu so");
     if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.push("Email khong hop le");
     if (!form.address.trim()) errs.push("Vui long nhap dia chi");
-    if (form.payment === "bank") errs.push("Thanh toan chuyen khoan dang phat trien");
+
     if (!cart.length) errs.push("Gio hang trong");
     return errs;
   };
 
-  const handleSubmit = async () => {
-    const errs = validate();
-    setErrors(errs);
-    if (errs.length) {
-      setSuccess("");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await OrderApi.create({
-        items: cart.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-        })),
-        shipping: {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          address: form.address,
-        },
-        paymentMethod: form.payment,
-      });
-      clearCart();
-      setCart([]);
-      setSuccess("Da xac nhan don hang thanh cong!");
-      setTimeout(() => navigate("/"), 1500);
-    } catch (error) {
-      console.error(error);
-      setErrors(["Khong the tao don hang. Vui long thu lai."]);
-      setSuccess("");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // THAY THẾ TOÀN BỘ HÀM handleSubmit
+// file: src/pages/Checkout.tsx
 
+// ... (Các imports đã có, đảm bảo có import OrderApi và toast, axios nếu cần)
+
+// Khai báo state cho phương thức thanh toán
+const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'COD' | 'PAYOS' | 'VNPAY'>('COD');
+const [isSubmitting, setIsSubmitting] = useState(false); // Đổi tên `submitting` thành `isSubmitting` cho tiện
+
+// THAY THẾ TOÀN BỘ HÀM handleSubmit
+// file: src/pages/user/Checkout.tsx
+
+// file: src/pages/user/Checkout.tsx
+
+const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const errs = validate();
+    if (errs.length) {
+        setErrors(errs);
+        return;
+    }
+    if (cart.length === 0) return;
+    setIsSubmitting(true);
+    setErrors([]);
+    
+    // 1. Chuẩn bị dữ liệu và Tạo đơn hàng
+    let shopOrderCode: string | null = null;
+    const total = cartTotal(cart);
+    const paymentMethod = form.payment; // Lấy từ form state
+
+    try {
+        const orderPayload = {
+            shipping: { name: form.name, phone: form.phone, email: form.email, address: form.address },
+            items: cart.map(item => ({
+                // ⚠️ QUAN TRỌNG: Đảm bảo tên trường là 'productId' nếu Backend yêu cầu
+                productId: item.product.id, // Dùng item.id (hoặc item.code nếu API của huynh nhận productCode)
+                quantity: item.quantity,
+            })),
+            totalAmount: total,
+            paymentMethod: paymentMethod, // đã là 'cod' hoặc 'vnpay'
+            notes: "Khong co ghi chu",
+        };
+
+        // ⚠️ Nếu Backend của huynh cần tổng tiền, hãy thêm nó vào orderPayload
+        // Ví dụ: totalAmount: total,
+
+        const orderRes = await OrderApi.create(orderPayload);
+        shopOrderCode = orderRes.data.code;
+
+    } catch (error) {
+      
+        const errorMessage = error.response?.data?.error || 'Lỗi không xác định khi tạo đơn hàng.';
+        toast.error('Lỗi khi tạo đơn hàng: ' + errorMessage);
+        setIsSubmitting(false);
+        return;
+    }
+
+    // 2. Xử lý thanh toán VNPAY / COD
+    if (paymentMethod === 'vnpay') {
+        try {
+            const response = await OrderApi.createVnPayUrl(total, shopOrderCode!);
+            const orderUrl = response.data.orderUrl;
+            
+            window.location.href = orderUrl;
+        } catch (error) {
+            toast.error('Lỗi khi tạo giao dịch VNPAY.');
+            setIsSubmitting(false);
+        }
+    } else { // paymentMethod === 'cod'
+        clearCart();
+        setCart([]);
+        toast.success('Đặt hàng thành công! Đơn hàng sẽ được giao trong vài ngày tới.');
+        // Chuyển hướng đến trang đơn hàng người dùng
+        navigate('/profile/orders'); // Hoặc '/orders' tùy theo RouterSetup của huynh
+    }
+
+    setIsSubmitting(false);
+};
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-slate-800">Thanh toan</h1>
@@ -126,18 +176,31 @@ export default function Checkout() {
               <h3 className="font-semibold text-slate-800 mb-3">Phuong thuc thanh toan</h3>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50">
-                  <input
-                    type="radio"
-                    name="payment"
-                    checked={form.payment === "cod"}
-                    onChange={() => handleChange("payment", "cod")}
-                  />
+                 <input
+    type="radio"
+    id="cod"
+    name="paymentMethod" // <-- PHẢI THÊM VÀ PHẢI GIỐNG NHAU
+    value="cod"
+    checked={form.payment === 'cod'}
+    onChange={() => handleChange('payment' as keyof typeof form, 'cod')} // <-- THÊM ONCHANGE
+    className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+/>
                   <span className="text-sm">Thanh toan khi nhan hang</span>
                 </label>
-                <label className="flex items-center gap-2 p-2 rounded text-slate-400">
-                  <input type="radio" name="payment" disabled checked={form.payment === "bank"} />
-                  <span className="text-sm">Chuyen khoan (dang phat trien)</span>
-                </label>
+             <label className="flex items-center space-x-3">
+       <input
+    type="radio"
+    id="vnpay"
+    name="paymentMethod" // <-- PHẢI GIỐNG VỚI CÁI TRÊN
+    value="vnpay"
+    checked={form.payment === 'vnpay'}
+    onChange={() => handleChange('payment' as keyof typeof form, 'vnpay')} // <-- THÊM ONCHANGE
+    className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+/>
+        <span className="text-gray-700 font-medium">
+            {PAYMENT_METHODS.VNPAY}
+        </span>
+    </label>
               </div>
             </div>
           </div>

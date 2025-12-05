@@ -13,4 +13,11 @@ export const OrderApi = {
   myOrders() {
     return http.get<Order[]>("/orders/me");
   },
+
+    createVnPayUrl(amount: number, shopOrderCode: string) { 
+        return http.post<{ orderUrl: string; orderCode: string }>("/orders/vnpay_create_url", {
+            amount,
+            shopOrderCode, // Sử dụng shopOrderCode để Backend tìm đơn hàng
+        });
+    },
 };
