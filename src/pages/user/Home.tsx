@@ -6,13 +6,56 @@ import { Product } from "../../types/product";
 import { Category } from "../../types/category";
 import "./css/AddToCartButton.css";
 import { gsap } from "gsap";
-
+import Toast from './Toast';
 // Khai báo lại window.MorphSVGPlugin để TypeScript biết nó tồn tại khi load bằng CDN
 declare global {
   interface Window {
     MorphSVGPlugin?: any;
   }
 }
+const ToastModal = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => {
+  const isSuccess = type === "success";
+
+  return (
+    // Backdrop (Nền mờ đen 50% + Làm mờ (Blur) + Hiệu ứng Fade In cho nền)
+    // opacity-100: trạng thái cuối của fade-in
+    <div className="fixed inset-0 z-50 flex items-center justify-center 
+                    bg-black/50 backdrop-blur-sm 
+                    transition-opacity duration-300 ease-out 
+                    opacity-100">
+      
+      {/* Modal Content (Hiện từ từ - Scale Up và Fade In) */}
+      {/* scale-100 opacity-100: trạng thái cuối của scale-up/fade-in */}
+      <div className="bg-white rounded-lg shadow-xl p-6 w-80 max-w-sm 
+                    transform transition-all duration-300 ease-out 
+                    dark:bg-slate-700 
+                    opacity-100 scale-100">
+        <div className={`text-center p-3 rounded-full mx-auto w-12 h-12 flex items-center justify-center ${isSuccess ? 'bg-emerald-100 dark:bg-emerald-800' : 'bg-rose-100 dark:bg-rose-800'}`}>
+          <svg className={`w-6 h-6 ${isSuccess ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            {isSuccess ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            )}
+          </svg>
+        </div>
+        <h3 className={`text-lg font-semibold text-center mt-4 ${isSuccess ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
+          {isSuccess ? "Thành công!" : "Thất bại!"}
+        </h3>
+        <p className="text-sm text-center text-slate-600 dark:text-slate-300 mt-2">{message}</p>
+        <div className="mt-5 sm:mt-6">
+          <button
+            type="button"
+            className={`inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:text-sm transition duration-150 ease-in-out ${isSuccess ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-rose-600 hover:bg-rose-700'}`}
+            onClick={onClose}
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const navigate = useNavigate();
@@ -73,7 +116,7 @@ export default function Home() {
   }, [products]);
   
   // Hàm runAddToCartAnimation
-  const runAddToCartAnimation = (button: HTMLElement) => {
+ const runAddToCartAnimation = (button: HTMLElement) => {
     // Đăng ký MorphSVGPlugin 
     if ((window as any).MorphSVGPlugin) {
         // 2. Đăng ký plugin. GSAP v3 sẽ tự động bỏ qua nếu nó đã được đăng ký.
@@ -220,9 +263,8 @@ export default function Home() {
     });
   };
   
-  const handleToast = (msg: string, type: "success" | "error" = "success") => {
+const handleToast = (msg: string, type: "success" | "error" = "success") => {
     setToast({ message: msg, type });
-    setTimeout(() => setToast(null), 2000);
   };
 
   return (
@@ -244,17 +286,19 @@ export default function Home() {
 
       {loading && <p className="text-sm text-slate-600">Dang tai san pham...</p>}
       {error && <p className="text-sm text-rose-600">{error}</p>}
-      {toast && (
-        <p className={`text-sm ${toast.type === "error" ? "text-rose-600" : "text-emerald-600"}`}>
-          {toast.message}
-        </p>
+    {toast?.message && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)} 
+        />
       )}
 
       {!loading && !error && categories.map((cat) => {
         const list = grouped[String(cat.id)] || [];
         if (!list.length) return null;
         return (
-          <div class="dark">
+          <div className="dark">
           <section key={cat.id} className="space-y-3">
             <h2 className="text-xl font-semibold text-slate-800">{cat.name}</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -320,14 +364,14 @@ export default function Home() {
                     <span>Thêm vào giỏ</span>
                     
                     {/* SVG cho hiệu ứng morph */}
-                   <svg class="morph" viewBox="0 0 64 13">
+                   <svg className="morph" viewBox="0 0 64 13">
                 <path d="M0 12C6 12 17 12 32 12C47.9024 12 58 12 64 12V13H0V12Z" />
             </svg>
                     
                     {/* Khu vực Áo */}
                     <div className="shirt">
                         {/* Áo phần 1 */}
-                           <svg class="first" viewBox="0 0 24 24">
+                           <svg className="first" viewBox="0 0 24 24">
                     <path d="M4.99997 3L8.99997 1.5C8.99997 1.5 10.6901 3 12 3C13.3098 3 15 1.5 15 1.5L19 3L22.5 8L19.5 10.5L19 9.5L17.1781 18.6093C17.062 19.1901 16.778 19.7249 16.3351 20.1181C15.4265 20.925 13.7133 22.3147 12 23C10.2868 22.3147 8.57355 20.925 7.66487 20.1181C7.22198 19.7249 6.93798 19.1901 6.82183 18.6093L4.99997 9.5L4.5 10.5L1.5 8L4.99997 3Z" />
                             {/* Logo Group */}
                             <g>

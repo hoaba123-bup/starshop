@@ -2,6 +2,7 @@ import { Outlet, Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/ThemeToggle";
 import React from 'react';
 import '../../user/css/MinimalistMenu.css';
+import Footer from "./Footer";
 
 const navLink = "text-sm font-medium text-white hover:text-white/80 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-white hover:after:w-full after:transition-all";
 
@@ -20,9 +21,9 @@ export default function UserLayout() {
   <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
   <Link to="/" className="flex items-center image-logo"> 
       <img 
-        src="/public/logo-starshop-Photoroom.png" // <<< THAY ĐỔI ĐƯỜNG DẪN NÀY
+        src="/public/unnamed-Photoroom.png" // <<< THAY ĐỔI ĐƯỜNG DẪN NÀY
         alt="StarShop Logo" 
-        className="h-8 w-auto" // Đặt chiều cao 8 units (khoảng 32px), w-auto giữ tỷ lệ
+        className="h-15 w-auto" // Đặt chiều cao 8 units (khoảng 32px), w-auto giữ tỷ lệ
       />
     </Link>
     <nav className="flex items-center gap-4">
@@ -83,9 +84,7 @@ export default function UserLayout() {
         <Outlet />
       </main>
 
-      <footer className="mt-auto border-t border-slate-200 bg-[#432DD7] text-white py-4 text-center text-sm">
-        &copy; {new Date().getFullYear()} StarShop. All rights reserved.
-      </footer>
+     <Footer/>
       
     </div>
   );
