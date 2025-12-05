@@ -31,13 +31,20 @@ const ThemeToggle: React.FC<{ className?: string }> = ({ className }) => {
   };
 
   return (
-    <button
+   <button
       type="button"
       onClick={toggleTheme}
-      className={`flex items-center gap-1 rounded-lg border border-slate-300/70 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-500 dark:text-slate-200 dark:hover:bg-slate-700 ${className ?? ""}`}
+      // Giữ nguyên các class Tailwind ban đầu của ThemeToggle
+      className={`flex items-center rounded-lg border border-slate-300/70 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-500 dark:text-slate-200 dark:hover:bg-slate-700 ${className ?? ""}`}
     >
-      {theme === "dark" ? "🌞" : "⚫"}
-      <span>{theme === "dark" ? "Light" : "Dark"} mode</span>
+      {/* SỬ DỤNG ICON MATERIAL SYMBOLS */}
+      <span className="material-symbols-rounded">
+        {/* Nếu theme là dark, hiển thị icon Light Mode (mặt trời) để chuyển sang Light.
+            Nếu theme là light, hiển thị icon Dark Mode (mặt trăng) để chuyển sang Dark.
+        */}
+        {theme === "dark" ? "light_mode" : "dark_mode"}
+      </span>
+      {/* Đã loại bỏ thẻ span chứa chữ "Light mode" / "Dark mode" */}
     </button>
   );
 };

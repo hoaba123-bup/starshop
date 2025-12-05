@@ -18,7 +18,7 @@
   
   /* // Center */
   body {
-    min-height: 100vh;
+    min-height: 100vh; 
    
     font-family: "Inter", Arial;
     background: #f2f2f9;
@@ -50,11 +50,11 @@
     --cart-clip: 0px;
     --cart-clip-x: 0px;
     --cart-tick-offset: 10px;
-    --cart-tick-color: #ff328b;
+    --cart-tick-color: #ff0000fc;
     --shirt-y: -16px;
     --shirt-scale: 0;
     --shirt-color: #17171b;
-    --shirt-logo: #b10000;
+    --shirt-logo: #4f46e5;
     --shirt-second-y: 24px;
     --shirt-second-color: #fff;
     --shirt-second-logo: #17171b;

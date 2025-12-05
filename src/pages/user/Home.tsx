@@ -261,7 +261,8 @@ export default function Home() {
               {list.map((p) => (
                 <div
                   key={p.id}
-                  className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm flex flex-col cursor-pointer"
+                  className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm flex flex-col cursor-pointer 
+             transition duration-300 transform hover:scale-[1.03] hover:shadow-xl dark:bg-slate-800 dark:border-slate-700"
                   onClick={() => navigate(`/product/${p.id}`)}
                 >
                   <div>
@@ -281,7 +282,8 @@ export default function Home() {
                   
                   {/* START: Nút Thêm vào giỏ đã được làm sạch */}
                   <button
-                    className="add-to-cart mt-auto" 
+                    className="add-to-cart mt-auto rounded-lg bg-indigo-600 px-3 py-2 text-white text-sm font-medium 
+             transition duration-300 transform hover:bg-indigo-700 hover:scale-[1.04] " 
                     onPointerDown={(e) => {
                       const button = e.currentTarget as HTMLElement;
                       if (button.classList.contains('active')) return;
