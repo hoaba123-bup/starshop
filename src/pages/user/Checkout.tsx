@@ -175,7 +175,7 @@ const handleSubmit = async (event: React.FormEvent) => {
             <div className="border-t border-slate-200 pt-4">
               <h3 className="font-semibold text-slate-800 mb-3">Phuong thuc thanh toan</h3>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50">
+                <label className="flex items-center gap-2  rounded hover:bg-slate-50">
                  <input
     type="radio"
     id="cod"
@@ -185,7 +185,7 @@ const handleSubmit = async (event: React.FormEvent) => {
     onChange={() => handleChange('payment' as keyof typeof form, 'cod')} // <-- THÊM ONCHANGE
     className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
 />
-                  <span className="text-sm">Thanh toan khi nhan hang</span>
+                  <span className="text-gray font-medium">Thanh toan khi nhan hang</span>
                 </label>
              <label className="flex items-center space-x-3">
        <input
@@ -197,7 +197,7 @@ const handleSubmit = async (event: React.FormEvent) => {
     onChange={() => handleChange('payment' as keyof typeof form, 'vnpay')} // <-- THÊM ONCHANGE
     className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
 />
-        <span className="text-gray-700 font-medium">
+        <span className="text-gray font-medium">
             {PAYMENT_METHODS.VNPAY}
         </span>
     </label>
