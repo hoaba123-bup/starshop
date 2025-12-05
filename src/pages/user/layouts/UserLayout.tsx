@@ -1,14 +1,17 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/ThemeToggle";
+import { USER_SESSION_EXP_KEY, USER_SESSION_NOTICE_FLAG, USER_TOKEN_KEY } from "../../../constants/auth";
 
 const navLink = "text-sm font-medium text-white hover:text-white/80 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-white hover:after:w-full after:transition-all";
 
 export default function UserLayout() {
   const navigate = useNavigate();
-  const isAuthenticated = !!localStorage.getItem("token");
+  const isAuthenticated = !!localStorage.getItem(USER_TOKEN_KEY);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(USER_TOKEN_KEY);
+    localStorage.removeItem(USER_SESSION_EXP_KEY);
+    sessionStorage.removeItem(USER_SESSION_NOTICE_FLAG);
     navigate("/sign-in");
   };
 
@@ -18,17 +21,17 @@ export default function UserLayout() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="text-lg font-semibold text-white">StarShop</Link>
           <nav className="flex items-center gap-4">
-            <Link to="/" className={navLink}>Home</Link>
-            <Link to="/cart" className={navLink}>Cart</Link>
-            <Link to="/profile/orders" className={navLink}>Orders</Link>
-            <Link to="/profile" className={navLink}>Profile</Link>
+            <Link to="/" className={navLink}>Trang chủ</Link>
+            <Link to="/cart" className={navLink}>Giỏ hàng</Link>
+            <Link to="/profile/orders" className={navLink}>Đơn hàng</Link>
+            <Link to="/profile" className={navLink}>Cá nhân</Link>
             <ThemeToggle />
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
                 className={navLink + " bg-none border-none cursor-pointer"}
               >
-                Sign Out
+                Đăng xuất
               </button>
             ) : (
               <Link to="/sign-in" className={navLink}>Sign In</Link>
@@ -47,3 +50,4 @@ export default function UserLayout() {
     </div>
   );
 }
+

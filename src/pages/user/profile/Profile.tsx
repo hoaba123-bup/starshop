@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { http } from "../../../apis/http";
 import DataTransferPanel from "../../../components/DataTransferPanel";
+import { useAppMessage } from "../../../hooks/useAppMessage";
 
 export default function Profile() {
   const [form, setForm] = useState({ fullName: "", email: "", phone: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const notify = useAppMessage();
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -20,7 +21,7 @@ export default function Profile() {
         });
       } catch (err) {
         console.error(err);
-        setError("Khong tai duoc thong tin tai khoan");
+        setError("Không tải được thông tin người dùng.");
       } finally {
         setLoading(false);
       }
@@ -30,8 +31,7 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!form.fullName.trim()) {
-      setError("Ho ten khong duoc de trong");
-      setSuccess("");
+      setError("Họ tên không được để trống");
       return;
     }
     setSaving(true);
@@ -46,12 +46,11 @@ export default function Profile() {
         email: res.data.email ?? "",
         phone: res.data.phone ?? "",
       });
-      setSuccess("Da luu thong tin thanh cong");
-      setTimeout(() => setSuccess(""), 2000);
+      notify.success("Đã lưu thay đổi");
     } catch (err) {
       console.error(err);
-      setError("Khong the cap nhat thong tin");
-      setSuccess("");
+      setError("Không thể cập nhật thông tin");
+      notify.error("Không thể cập nhật thông tin");
     } finally {
       setSaving(false);
     }
@@ -62,14 +61,13 @@ export default function Profile() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Thong tin ca nhan</h1>
-        <p className="text-sm text-slate-600 mt-1">Xem va cap nhat thong tin tai khoan cua ban</p>
+        <h1 className="text-3xl font-bold text-slate-800">Thông tin cá nhân</h1>
+        <p className="text-sm text-slate-600 mt-1">Xem và cập nhật thông tin tài khoản của bạn</p>
       </div>
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4 dark:bg-slate-800 dark:border-slate-600">
-        {success && <p className="text-sm text-emerald-600">{success}</p>}
         {error && <p className="text-sm text-rose-600">{error}</p>}
         <label className="text-sm text-slate-600">
-          Ho ten *
+          Họ tên *
           <input
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
             value={form.fullName}
@@ -85,7 +83,7 @@ export default function Profile() {
           />
         </label>
         <label className="text-sm text-slate-600">
-          So dien thoai
+          Số điện thoại
           <input
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
             value={form.phone}
@@ -95,9 +93,9 @@ export default function Profile() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700 disabled:opacity-60"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700 disabled:opacity-60 mt-4"
         >
-          {saving ? "Dang luu..." : "Luu thay doi"}
+          {saving ? "Đang lưu..." : "Lưu thay đổi"}
         </button>
       </div>
 

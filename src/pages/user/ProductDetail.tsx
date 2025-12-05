@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { addToCart } from "../../utils/cart";
 import { http } from "../../apis/http";
 import { Product } from "../../types/product";
+import { useAppMessage } from "../../hooks/useAppMessage";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,7 +12,6 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -23,7 +23,7 @@ export default function ProductDetail() {
         setProduct(res.data);
       } catch (err) {
         console.error(err);
-        setError("San pham khong ton tai hoac da bi an.");
+        setError("Sản phẩm không tồn tại hoặc đã bị ẩn.");
         setTimeout(() => navigate("/"), 2000);
       } finally {
         setLoading(false);
@@ -32,18 +32,19 @@ export default function ProductDetail() {
     fetchDetail();
   }, [id, navigate]);
 
-  if (loading) return <p className="text-sm text-slate-600">Dang tai...</p>;
+  if (loading) return <p className="text-sm text-slate-600">Đang tải...</p>;
   if (error) return <p className="text-sm text-rose-600">{error}</p>;
   if (!product) return null;
+
+  const notify = useAppMessage();
 
   const handleAddToCart = () => {
     const result = addToCart(product, qty);
     if (result.success) {
-      setToast({ message: "Da them san pham vao gio hang", type: "success" });
+      notify.success("Đã thêm sản phẩm vào giỏ hàng");
     } else {
-      setToast({ message: result.message || "San pham da het hang", type: "error" });
+      notify.error(result.message || "Sản phẩm đã hết hàng");
     }
-    setTimeout(() => setToast(null), 2000);
   };
 
   return (
@@ -56,13 +57,13 @@ export default function ProductDetail() {
         )}
       </div>
       <div className="space-y-4">
-        <p className="text-sm text-slate-500">Danh muc: {product.categoryName}</p>
+        <p className="text-sm text-slate-500">Danh mục: {product.categoryName}</p>
         <h1 className="text-2xl font-bold text-slate-800">{product.name}</h1>
         <p className="text-indigo-600 text-xl font-semibold">
           {Number(product.price).toLocaleString("vi-VN")} VND
         </p>
         {typeof product.stock === "number" && (
-          <p className="text-xs text-slate-500">Ton kho: {product.stock}</p>
+          <p className="text-xs text-slate-500">Tồn kho: {product.stock}</p>
         )}
         <p className="text-sm text-slate-600">{product.description}</p>
         <div className="flex items-center gap-3">
@@ -77,14 +78,9 @@ export default function ProductDetail() {
             className="rounded-lg bg-indigo-600 px-4 py-2 text-white font-medium hover:bg-indigo-700"
             onClick={handleAddToCart}
           >
-            Them vao gio
+            Thêm vào giỏ hàng
           </button>
         </div>
-        {toast && (
-          <p className={`text-sm ${toast.type === "error" ? "text-rose-600" : "text-emerald-600"}`}>
-            {toast.message}
-          </p>
-        )}
       </div>
     </div>
   );

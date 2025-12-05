@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthApi } from "../../../apis/auth.api";
+import { SESSION_DURATION_MS, USER_SESSION_EXP_KEY, USER_SESSION_NOTICE_FLAG, USER_TOKEN_KEY } from "../../../constants/auth";
 
 interface FormErrors {
   [key: string]: string;
@@ -28,22 +29,23 @@ export default function SignIn() {
     setErrors({});
 
     try {
-      console.log('SignIn attempt:', { email: form.email });
       const response = await AuthApi.signIn({
         email: form.email,
         password: form.password
       });
 
-      console.log('SignIn response:', response);
-      localStorage.setItem("token", (response.data as any).token);
-      
-      const user = (response.data as any).user;
-      console.log('User:', user);
-      if (user.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
+      const payload = response.data as any;
+      const user = payload.user;
+      if (user.role !== "user") {
+        setErrors({ submit: "Tài khoản quản trị vui lòng dùng /admin" });
+        setLoading(false);
+        return;
       }
+
+      localStorage.setItem(USER_TOKEN_KEY, payload.token);
+      localStorage.setItem(USER_SESSION_EXP_KEY, String(Date.now() + SESSION_DURATION_MS));
+      sessionStorage.removeItem(USER_SESSION_NOTICE_FLAG);
+      navigate("/");
     } catch (error: any) {
       console.error('SignIn error:', error);
       if (error.response?.data?.errors) {
@@ -136,3 +138,7 @@ export default function SignIn() {
     </div>
   );
 }
+
+
+
+

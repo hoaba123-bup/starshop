@@ -4,6 +4,7 @@ import { addToCart } from "../../utils/cart";
 import { http } from "../../apis/http";
 import { Product } from "../../types/product";
 import { Category } from "../../types/category";
+import { useAppMessage } from "../../hooks/useAppMessage";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -45,7 +45,7 @@ export default function Home() {
         setProducts(res.data || []);
       } catch (err) {
         console.error(err);
-        setError("Khong tai duoc danh sach san pham");
+        setError("Không tải được danh sách sản phẩm.");
       } finally {
         setLoading(false);
       }
@@ -63,36 +63,28 @@ export default function Home() {
     return map;
   }, [products]);
 
-  const handleToast = (msg: string, type: "success" | "error" = "success") => {
-    setToast({ message: msg, type });
-    setTimeout(() => setToast(null), 2000);
-  };
+  const notify = useAppMessage();
+
 
   return (
     <div className="space-y-6">
       <section className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-800">Tim kiem san pham</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Tìm kiếm sản phẩm</h1>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Tu khoa ten san pham" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+          <input className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Từ khóa tên sản phẩm" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
           <select className="rounded-lg border border-slate-300 px-3 py-2 text-sm" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-            <option value="">Tat ca danh muc</option>
+            <option value="">Tất cả danh mục</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Gia toi thieu" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
-          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Gia toi da" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Giá tối thiểu" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Giá tối đa" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
         </div>
       </section>
 
-      {loading && <p className="text-sm text-slate-600">Dang tai san pham...</p>}
+      {loading && <p className="text-sm text-slate-600">Đang tải sản phẩm...</p>}
       {error && <p className="text-sm text-rose-600">{error}</p>}
-      {toast && (
-        <p className={`text-sm ${toast.type === "error" ? "text-rose-600" : "text-emerald-600"}`}>
-          {toast.message}
-        </p>
-      )}
-
       {!loading && !error && categories.map((cat) => {
         const list = grouped[String(cat.id)] || [];
         if (!list.length) return null;
@@ -126,13 +118,13 @@ export default function Home() {
                       e.stopPropagation();
                       const result = addToCart(p, 1);
                       if (result.success) {
-                        handleToast("Da them san pham vao gio hang", "success");
+                        notify.success("Đã thêm sản phẩm vào giỏ hàng");
                       } else {
-                        handleToast(result.message || "San pham da het hang", "error");
+                        notify.error(result.message || "Sản phẩm đã hết hàng");
                       }
                     }}
                   >
-                    Them vao gio
+                    Thêm vào giỏ
                   </button>
                 </div>
               ))}

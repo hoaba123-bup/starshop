@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminApi, AdminStats } from "../../apis/admin.api";
 import MonthlyRevenueChart from "./components/MonthlyRevenueChart";
 import DataTransferPanel from "../../components/DataTransferPanel";
@@ -23,7 +23,7 @@ export default function AdminDashboard() {
       setStats(res.data);
     } catch (err) {
       console.error(err);
-      setError("Khong tai duoc thong ke. Vui long thu lai.");
+      setError("Không tải được số liệu thống kê.");
     } finally {
       setLoading(false);
     }
@@ -37,10 +37,10 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: "Doanh thu", value: stats?.revenue ?? 0, formatter: formatCurrency },
-    { label: "Tong don hang", value: stats?.orders ?? 0 },
-    { label: "Don dang cho", value: stats?.pendingOrders ?? 0 },
-    { label: "Khach hang", value: stats?.customers ?? 0 },
-    { label: "San pham", value: stats?.products ?? 0 },
+    { label: "Tổng đơn hàng", value: stats?.orders ?? 0 },
+    { label: "Đơn hàng chờ", value: stats?.pendingOrders ?? 0 },
+    { label: "Khách hàng", value: stats?.customers ?? 0 },
+    { label: "Sản phẩm", value: stats?.products ?? 0 },
   ];
 
   return (
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
           <p className="text-sm text-slate-600 mt-1">
-            Tong quan doanh thu va hoat dong ban hang
+            Tổng quan doanh thu và hoạt động của cửa hàng
           </p>
         </div>
         <button
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
           onClick={fetchStats}
           disabled={loading}
         >
-          {loading ? "Dang tai..." : "Lam moi"}
+          {loading ? "Đang tải..." : "Làm mới"}
         </button>
       </div>
 
@@ -84,10 +84,10 @@ export default function AdminDashboard() {
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-slate-800">
-            Doanh thu 12 thang gan nhat
+            Doanh thu 12 tháng qua
           </h2>
           <span className="text-xs text-slate-500">
-            Don da duyet: {stats?.approvedOrders ?? 0}
+            Đơn đã duyệt: {stats?.approvedOrders ?? 0}
           </span>
         </div>
         <MonthlyRevenueChart data={monthly} />

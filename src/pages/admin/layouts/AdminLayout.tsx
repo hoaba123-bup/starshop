@@ -1,15 +1,19 @@
-import React from "react";
+import { ADMIN_SESSION_EXP_KEY, ADMIN_TOKEN_KEY } from "../../../constants/auth";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/ThemeToggle";
+import { useAppMessageContext } from "../../../components/ui/AppMessageProvider";
 
 const navLink =
   "text-sm font-medium text-white hover:text-white/80 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-white hover:after:w-full after:transition-all";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const message = useAppMessageContext();
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(ADMIN_SESSION_EXP_KEY);
+    message.warning("Hết phiên đăng nhập");
     navigate("/admin/login");
   };
 
@@ -20,23 +24,23 @@ export default function AdminLayout() {
           <span className="text-lg font-semibold text-white">StarShop Admin</span>
           <nav className="flex items-center gap-4">
             <Link to="/admin/dashboard" className={navLink}>
-              Dashboard
+              Tổng quan
             </Link>
             <Link to="/admin/dashboard/products" className={navLink}>
-              Products
+              Sản phẩm
             </Link>
             <Link to="/admin/dashboard/orders" className={navLink}>
-              Orders
+              Đơn hàng
             </Link>
             <Link to="/admin/dashboard/customers" className={navLink}>
-              Customers
+              Khách hàng
             </Link>
             <ThemeToggle />
             <button
               onClick={handleSignOut}
               className="text-sm font-semibold text-white hover:text-white/80 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white hover:after:w-full after:transition-all transition-colors hover:cursor-pointer"
             >
-              Sign Out
+              Đăng xuất
             </button>
           </nav>
         </div>

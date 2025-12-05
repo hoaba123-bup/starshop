@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthApi } from "../../../apis/auth.api";
+import { SESSION_DURATION_MS, USER_SESSION_EXP_KEY, USER_SESSION_NOTICE_FLAG, USER_TOKEN_KEY } from "../../../constants/auth";
 
 interface FormErrors {
   [key: string]: string;
@@ -39,7 +40,9 @@ export default function SignUp() {
         confirmPassword: form.confirmPassword
       });
 
-      localStorage.setItem("token", (response.data as any).token);
+      localStorage.setItem(USER_TOKEN_KEY, (response.data as any).token);
+      localStorage.setItem(USER_SESSION_EXP_KEY, String(Date.now() + SESSION_DURATION_MS));
+      sessionStorage.removeItem(USER_SESSION_NOTICE_FLAG);
       setSuccessMessage("Đăng ký thành công! Đang chuyển hướng...");
 
       setTimeout(() => {
@@ -191,3 +194,5 @@ export default function SignUp() {
     </div>
   );
 }
+
+
