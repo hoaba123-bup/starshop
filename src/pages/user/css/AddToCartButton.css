@@ -36,6 +36,7 @@
   }
   
   .add-to-cart {
+  margin-top: 10px !important;
     --background-default: #17171b;
     --background-hover: #0a0a0c;
     --background-scale: 1;
@@ -81,6 +82,7 @@
       transition: background 0.25s;
       background: var(--background, var(--background-default));
       transform: scaleX(var(--background-scale)) translateZ(0);
+     
     }
     &:not(.active) {
       &:hover {
@@ -206,4 +208,119 @@
     /* Đảo ngược màu Logo Áo từ Tối sang Sáng (để nổi bật hơn) */
     --shirt-logo: #aaaaaa; /* Màu logo sáng/xám nhạt */
     --shirt-second-logo: #cccccc; /* Màu logo sáng khác */
+}
+/* ================================================= */
+/* 1. STYLES CHO CONTAINER BỘ LỌC (Sắc nét và Sâu hơn) */
+/* ================================================= */
+.filter-container {
+    border-radius: 1.25rem; /* Rộng hơn: rounded-xl */
+    padding: 2.5rem; /* Thông thoáng hơn: p-10 */
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.05); /* Shadow mềm và sâu hơn */
+    border: none; /* Bỏ border ngoài để tập trung vào shadow */
+    background-color: #ffffff;
+    margin-bottom: 2rem;
+}
+
+/* 2. STYLES CHO INPUT VÀ SELECT (Hiệu ứng tinh tế) */
+.filter-input {
+    width: 100%;
+    border-radius: 0.75rem; /* Bo tròn hơn: rounded-xl */
+    border: 2px solid #e5e7eb; /* Border dày hơn, màu nhạt */
+    padding: 0.45rem 1.05rem; /* py-3 và px-5 */
+    font-size: 0.8rem; /* text-base (Lớn hơn một chút) */
+    color: #1f2937; /* text-gray-900 */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Chuyển động mượt mà hơn */
+    appearance: none; /* Tắt giao diện mặc định (quan trọng cho select) */
+}
+
+/* Hiệu ứng khi focus (Nhấn vào) */
+.filter-input:focus {
+    outline: none;
+    border-color: #4f46e5; /* Màu Indigo chủ đạo */
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); /* Focus ring mờ, rõ nét */
+    background-color: #f9fafb; /* Thay đổi background nhẹ khi focus */
+}
+
+/* 3. STYLES CHO LƯỚI BỘ LỌC */
+.filter-grid {
+    display: grid;
+    gap: 1.25rem; /* gap-5 */
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+    .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .filter-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+body {
+    /* Đảm bảo font hiển thị sắc nét, không bị nhòe/răng cưa */
+    -webkit-font-smoothing: antialiased; 
+    -moz-osx-font-smoothing: grayscale; 
+    font-smoothing: antialiased;
+    /* Áp dụng một font hiện đại, dễ đọc nếu chưa có */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ================================================= */
+/* 2. STYLES CHO TIÊU ĐỀ (Tương đương text-3xl & font-extrabold) */
+/* ================================================= */
+.search-heading {
+    /* Kích thước lớn: text-3xl */
+    font-size: 1.375rem; /* Khoảng 30px */
+    line-height: 2.25rem; 
+
+    /* Độ đậm cực lớn: font-extrabold */
+    font-weight: 700; 
+
+    /* Màu đen sâu, sắc nét: text-gray-900 */
+    color: #111827; 
+    
+    /* Khoảng cách lề dưới: mb-2 */
+    margin-bottom: 0.5rem; 
+}
+/* ================================================= */
+/* 1. STYLES CHO THẺ BỌC (.input-wrapper) */
+/* ================================================= */
+.input-wrapper {
+    /* Quan trọng: Đây là điểm tham chiếu cho icon */
+    position: relative; 
+    width: 100%;
+}
+
+/* ================================================= */
+/* 2. STYLES CHO ICON (.search-icon) */
+/* ================================================= */
+.search-icon {
+    /* Đặt icon theo vị trí tuyệt đối (trong thẻ bọc) */
+    position: absolute;
+    
+    /* Căn chỉnh vị trí */
+    top: 50%;
+    left: 1rem; /* Cách lề trái 16px */
+    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+    
+    /* Kích thước và màu sắc */
+    width: 1.25rem; /* ~ 20px */
+    height: 1.25rem;
+    color: #6b7280; /* Màu xám nhẹ (text-gray-500) */
+    
+    /* Đảm bảo icon không cản trở việc click vào input */
+    pointer-events: none; 
+}
+
+/* ================================================= */
+/* 3. ĐIỀU CHỈNH INPUT (Đẩy chữ sang phải) */
+/* ================================================= */
+
+/* Tạo một lớp mới cho input có icon để điều chỉnh padding */
+.input-with-icon {
+    /* Tăng lề trái (padding-left) để chữ không bị icon che mất */
+    padding-left: 3rem !important; /* Đủ chỗ cho icon (1rem) + khoảng trống (1rem) + vị trí ban đầu (1rem) */
 }

@@ -269,20 +269,69 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-800">Tim kiem san pham</h1>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Tu khoa ten san pham" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
-          <select className="rounded-lg border border-slate-300 px-3 py-2 text-sm" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-            <option value="">Tat ca danh muc</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Gia toi thieu" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
-          <input type="number" min={0} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Gia toi da" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
-        </div>
-      </section>
+     <section className="filter-container"> 
+               <h1 className="search-heading">Tìm kiếm Sản phẩm</h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Lọc theo từ khóa, danh mục và khoảng giá.</p>
+                
+                {/* THAY THẾ DIV NÀY */}
+                <div className="filter-grid mt-4"> 
+                    
+                    {/* 1. TỪ KHÓA */}
+                    {/* THAY THẾ CÁC CLASS CỦA INPUT */}
+                   <div className="input-wrapper">
+        
+        {/* ICON KÍNH LÚP (Sử dụng SVG hoặc thư viện icon) */}
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="currentColor" 
+            className="search-icon"
+        >
+            <path d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.643 4.644a.75.75 0 1 1-1.06 1.06l-4.644-4.643A8.25 8.25 0 0 1 2.25 10.5Z" />
+        </svg>
+
+        {/* INPUT CŨ */}
+        <input 
+            className="filter-input input-with-icon" 
+            placeholder="Tìm kiếm theo từ khóa" 
+            value={keyword} 
+            onChange={(e) => setKeyword(e.target.value)} 
+        />
+    </div>
+                    {/* 2. DANH MỤC */}
+                    {/* THAY THẾ CÁC CLASS CỦA SELECT */}
+                    <select 
+                        className="filter-input" 
+                        value={categoryId} 
+                        onChange={(e) => setCategoryId(e.target.value)}
+                    >
+                        <option value="">Tất cả danh mục</option>
+                        {categories.map((c) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                    </select>
+
+                    {/* 3. GIÁ TỐI THIỂU */}
+                    <input 
+                        type="number" 
+                        min={0} 
+                        className="filter-input" 
+                        placeholder="Giá tối thiểu (VND)" 
+                        value={minPrice} 
+                        onChange={(e) => setMinPrice(e.target.value)} 
+                    />
+                    
+                    {/* 4. GIÁ TỐI ĐA */}
+                    <input 
+                        type="number" 
+                        min={0} 
+                        className="filter-input" 
+                        placeholder="Giá tối đa (VND)" 
+                        value={maxPrice} 
+                        onChange={(e) => setMaxPrice(e.target.value)} 
+                    />
+                </div>
+            </section>
 
       {loading && <p className="text-sm text-slate-600">Dang tai san pham...</p>}
       {error && <p className="text-sm text-rose-600">{error}</p>}
