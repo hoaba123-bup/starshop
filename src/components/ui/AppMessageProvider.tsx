@@ -1,5 +1,7 @@
 ﻿import React, { createContext, useContext, useMemo } from "react";
 import { message } from "antd";
+import 'antd/dist/reset.css';
+
 
 type NotifyFn = (content: React.ReactNode, config?: Parameters<typeof message.open>[0]) => void;
 

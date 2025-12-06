@@ -20,7 +20,7 @@ const [form, setForm] = useState({
   const PAYMENT_METHODS = {
     COD: 'Thanh toán khi nhận hàng (COD)',
     // XÓA PAYOS: 'Ví điện tử & Thẻ ngân hàng (PayOS)',
-    VNPAY: 'Thẻ ATM & Visa/Mastercard (VNPAY)', // GIỮ LẠI
+    VNPAY: ' Thẻ ATM & Visa/Mastercard (VNPAY)', // GIỮ LẠI
 };
   const [errors, setErrors] = useState<string[]>([]);
   const notify = useAppMessage();
@@ -48,39 +48,7 @@ const [form, setForm] = useState({
     return errs;
   };
 
-  const handleSubmit = async () => {
-    const errs = validate();
-    setErrors(errs);
-    if (errs.length) return;
-    setSubmitting(true);
-    try {
-      await OrderApi.create({
-        items: cart.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-        })),
-        shipping: {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          address: form.address,
-        },
-        paymentMethod: form.payment,
-      });
-      clearCart();
-      setCart([]);
-      notify.success("Đã tạo đơn hàng thành công!");
-      setTimeout(() => navigate("/"), 1500);
-    } catch (error) {
-      console.error(error);
-      setErrors(["Không thể tạo đơn hàng. Vui lòng thử lại."]);
-      notify.error("Không thể tạo đơn hàng. Vui lòng thử lại.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
->>>>>>> phiendangnhap
-
+  
 // ... (Các imports đã có, đảm bảo có import OrderApi và toast, axios nếu cần)
 
 // Khai báo state cho phương thức thanh toán
@@ -221,7 +189,7 @@ const handleSubmit = async (event: React.FormEvent) => {
                   <span className="text-gray font-medium">Thanh toan khi nhan hang</span>
 
                 </label>
-             <label className="flex items-center space-x-3">
+             <label className="flex items-center gap-2 space-x-3">
        <input
     type="radio"
     id="vnpay"
@@ -232,7 +200,8 @@ const handleSubmit = async (event: React.FormEvent) => {
     className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
 />
         <span className="text-gray font-medium">
-            {PAYMENT_METHODS.VNPAY}
+           
+ Thẻ ATM & Visa/Mastercard (VNPAY)
         </span>
     </label>
               </div>

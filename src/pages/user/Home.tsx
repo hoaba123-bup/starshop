@@ -14,6 +14,7 @@ declare global {
     MorphSVGPlugin?: any;
   }
 }
+
 const ToastModal = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => {
   const isSuccess = type === "success";
 
@@ -71,7 +72,7 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -135,7 +136,6 @@ export default function Home() {
     // Đảm bảo nút đang ở trạng thái active
     button.classList.add('active');
 
-<<<<<<< HEAD
     // Animation 1: Background scale
     gsap.to(button, {
         keyframes: [{
