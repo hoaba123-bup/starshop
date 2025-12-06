@@ -271,7 +271,7 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
     <div className="space-y-6">
      <section className="filter-container"> 
                <h1 className="search-heading">Tìm kiếm Sản phẩm</h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Lọc theo từ khóa, danh mục và khoảng giá.</p>
+                <p className="textdis text-sm text-slate-500 dark:text-slate-400 mb-6">Lọc theo từ khóa, danh mục và khoảng giá.</p>
                 
                 {/* THAY THẾ DIV NÀY */}
                 <div className="filter-grid mt-4"> 
@@ -350,7 +350,7 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
           <div className="dark">
           <section key={cat.id} className="space-y-3">
             <h2 className="text-xl font-semibold text-slate-800">{cat.name}</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {list.map((p) => (
                 <div
                   key={p.id}
