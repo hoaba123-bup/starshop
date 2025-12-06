@@ -3,3 +3,5 @@ chỉ admin mới được thực hiện hành động nhạy cảm như tạo/s
 
 chạy server: npx tsx server.ts
 chạy frontEnd: npm run dev
+
+chỉnh thời gian cho 1 phiên đăng nhập tại src/constants/auth.ts
