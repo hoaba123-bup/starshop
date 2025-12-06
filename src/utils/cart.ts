@@ -33,7 +33,7 @@ export function getCart() {
 export function addToCart(product: Product, quantity: number): AddToCartResult {
   const cart = read();
   if (quantity <= 0) {
-    return { success: false, cart, message: "So luong khong hop le" };
+    return { success: false, cart, message: "Số lượng không hợp lệ" };
   }
   const idx = cart.findIndex((c) => String(c.product.id) === String(product.id));
   const currentQty = idx >= 0 ? cart[idx].quantity : 0;
@@ -42,13 +42,13 @@ export function addToCart(product: Product, quantity: number): AddToCartResult {
   if (typeof stock === "number") {
     const remaining = stock - currentQty;
     if (remaining <= 0) {
-      return { success: false, cart, message: "San pham da het hang" };
+      return { success: false, cart, message: "Sản phẩm đã hết hàng" };
     }
     if (quantity > remaining) {
       return {
         success: false,
         cart,
-        message: `Chi con ${remaining} san pham trong kho`,
+        message: `Chỉ còn ${remaining} sản phẩm trong kho`,
       };
     }
   }

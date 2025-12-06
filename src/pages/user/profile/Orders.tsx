@@ -3,9 +3,9 @@ import { Order } from "../../../types/order";
 import { OrderApi } from "../../../apis/order.api";
 
 const statusLabel: Record<string, string> = {
-  pending: "Cho xu ly",
-  approved: "Da giao",
-  cancelled: "Da huy",
+  pending: "Chờ xử lý",
+  approved: "Đã giao",
+  cancelled: "Đã hủy",
 };
 
 export default function Orders() {
@@ -26,7 +26,7 @@ export default function Orders() {
       setOrders(res.data || []);
     } catch (err) {
       console.error(err);
-      setError("Khong tai duoc lich su don hang.");
+      setError("Không tải được lịch sử đơn hàng.");
     } finally {
       setLoading(false);
     }
@@ -35,8 +35,8 @@ export default function Orders() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Don hang cua toi</h1>
-        <p className="text-sm text-slate-600 mt-1">Theo doi trang thai va chi tiet don</p>
+        <h1 className="text-3xl font-bold text-slate-800">Đơn hàng của tôi</h1>
+        <p className="text-sm text-slate-600 mt-1">Theo dõi trạng thái và chi tiết đơn</p>
       </div>
       {error && (
         <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
@@ -47,24 +47,24 @@ export default function Orders() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200">
-              <th className="text-left py-3 px-4 font-semibold text-slate-700">Ma don</th>
-              <th className="text-left py-3 px-4 font-semibold text-slate-700">Ngay dat</th>
-              <th className="text-left py-3 px-4 font-semibold text-slate-700">Tong tien</th>
-              <th className="text-left py-3 px-4 font-semibold text-slate-700">Trang thai</th>
-              <th className="text-center py-3 px-4 font-semibold text-slate-700">Hanh dong</th>
+              <th className="text-left py-3 px-4 font-semibold text-slate-700">Mã đơn</th>
+              <th className="text-left py-3 px-4 font-semibold text-slate-700">Ngày đặt</th>
+              <th className="text-left py-3 px-4 font-semibold text-slate-700">Tổng tiền</th>
+              <th className="text-left py-3 px-4 font-semibold text-slate-700">Trạng thái</th>
+              <th className="text-center py-3 px-4 font-semibold text-slate-700">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-slate-500">
-                  Dang tai...
+                  Đang tải...
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-slate-500">
-                  Ban chua co don hang nao.
+                  Bạn chưa có đơn hàng nào.
                 </td>
               </tr>
             ) : (
@@ -92,7 +92,7 @@ export default function Orders() {
                           setExpanded((prev) => (prev === order.id ? null : order.id))
                         }
                       >
-                        {expanded === order.id ? "Thu gon" : "Chi tiet"}
+                        {expanded === order.id ? "Thu gọn" : "Chi tiết"}
                       </button>
                     </td>
                   </tr>
@@ -100,7 +100,7 @@ export default function Orders() {
                     <tr className="bg-[#432DD7]/10">
                       <td colSpan={5} className="px-4 pb-4">
                         <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">
-                          <p className="font-semibold text-slate-800 mb-2">San pham</p>
+                          <p className="font-semibold text-slate-800 mb-2">Sản phẩm</p>
                           <ul className="space-y-1">
                             {order.items?.map((item) => (
                               <li key={item.id} className="flex justify-between">
@@ -114,8 +114,8 @@ export default function Orders() {
                             ))}
                           </ul>
                           <div className="mt-4 border-t border-slate-200 pt-3">
-                            <p>Dia chi giao: {order.shippingAddress || "-"}</p>
-                            <p>Phuong thuc: {order.paymentMethod}</p>
+                            <p>Địa chỉ giao: {order.shippingAddress || "-"}</p>
+                            <p>Phương thức: {order.paymentMethod}</p>
                           </div>
                         </div>
                       </td>

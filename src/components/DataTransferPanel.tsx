@@ -29,7 +29,7 @@ const DataTransferPanel: React.FC<Props> = ({ mode }) => {
 
   const exportData = async (resource: Resource) => {
     try {
-      setStatus(`Dang xuat ${resource}...`);
+      setStatus(`Đang xuất ${resource}...`);
       let payload: any[] = [];
       if (resource === "products") {
         if (mode === "admin") {
@@ -49,10 +49,10 @@ const DataTransferPanel: React.FC<Props> = ({ mode }) => {
         }
       }
       downloadJSON(payload, `${resource}-${new Date().toISOString()}.json`);
-      setStatus(`Da xuat ${resource} thanh cong.`);
+      setStatus(`Đã xuất ${resource} thành công.`);
     } catch (error) {
       console.error(error);
-      setStatus(`Khong the xuat ${resource}.`);
+      setStatus(`Không thể xuất ${resource}.`);
     }
   };
 
@@ -60,37 +60,37 @@ const DataTransferPanel: React.FC<Props> = ({ mode }) => {
     if (!canImport) return;
     const file = resource === "products" ? productFile : orderFile;
     if (!file) {
-      setStatus("Vui long chon tep JSON truoc.");
+      setStatus("Vui lòng chọn tệp JSON trước.");
       return;
     }
     try {
-      setStatus(`Dang nhap ${resource}...`);
+      setStatus(`Đang nhập ${resource}...`);
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!Array.isArray(parsed)) {
-        throw new Error("Du lieu khong phai mang");
+        throw new Error("Dữ liệu không hợp lệ");
       }
       if (resource === "products") {
         await AdminApi.products.import(parsed as Partial<Product>[]);
       } else {
         await AdminApi.orders.import(parsed as Partial<Order>[]);
       }
-      setStatus(`Da nhap ${resource} thanh cong.`);
+      setStatus(`Đã nhập ${resource} thành công.`);
     } catch (error) {
       console.error(error);
-      setStatus(`Khong the nhap ${resource}. Vui long kiem tra dinh dang tep.`);
+      setStatus(`Không thể nhập ${resource}. Vui lòng kiểm tra định dạng tệp.`);
     }
   };
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-slate-800 dark:border-slate-600">
       <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
-        Import / Export du lieu
+        Import / Export dữ liệu
       </h3>
       {status && <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">{status}</p>}
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">San pham</h4>
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Sản phẩm</h4>
           <div className="flex flex-wrap gap-2">
             <button
               className="rounded-lg bg-indigo-600 px-4 py-2 text-white text-sm font-semibold hover:bg-indigo-700"
@@ -117,7 +117,7 @@ const DataTransferPanel: React.FC<Props> = ({ mode }) => {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Don hang</h4>
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Đơn hàng</h4>
           <div className="flex flex-wrap gap-2">
             <button
               className="rounded-lg bg-indigo-600 px-4 py-2 text-white text-sm font-semibold hover:bg-indigo-700"
@@ -146,7 +146,7 @@ const DataTransferPanel: React.FC<Props> = ({ mode }) => {
       </div>
       {mode === "user" && (
         <p className="mt-4 text-xs text-slate-500">
-          * Chi admin moi co the nhap du lieu. Ban co the xuat danh sach san pham va don hang cua minh.
+          * Chỉ admin mới có thể nhập dữ liệu. Bạn có thể xuất danh sách sản phẩm và đơn hàng của mình.
         </p>
       )}
     </section>

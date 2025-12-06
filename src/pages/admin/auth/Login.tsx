@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { http } from "../../../apis/http";
+import { httpAdmin } from "../../../apis/http";
+import { ADMIN_SESSION_EXP_KEY, ADMIN_TOKEN_KEY, SESSION_DURATION_MS } from "../../../constants/auth";
 
 interface FormState {
   email: string;
@@ -16,7 +17,7 @@ interface FormErrors {
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const decodeRole = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) return null;
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -33,10 +34,11 @@ export default function AdminLogin() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (decodeRole() === "admin") {
-      navigate("/admin/dashboard");
-    }
+  useEffect(() => {    
+  const role = decodeRole();
+      if (role === "admin" || role === "staff") {
+             navigate("/admin/dashboard");
+      }  
   }, [navigate]);
 
   const handleChange = (key: keyof FormState, value: string) => {
@@ -52,15 +54,15 @@ export default function AdminLogin() {
     const trimmedPassword = form.password.trim();
 
     if (!trimmedEmail) {
-      result.email = "Email khong duoc de trong";
+      result.email = "Email không được để trống";
     } else if (!emailRegex.test(trimmedEmail)) {
-      result.email = "Email khong hop le";
+      result.email = "Email không hợp lệ";
     }
 
     if (!trimmedPassword) {
-      result.password = "Mat khau khong duoc de trong";
+      result.password = "Mật khẩu không được để trống";
     } else if (trimmedPassword.length < 6) {
-      result.password = "Mat khau toi thieu 6 ky tu";
+      result.password = "Mật khẩu phải có ít nhất 6 ký tự";
     }
 
     return result;
@@ -78,13 +80,14 @@ export default function AdminLogin() {
     try {
       setLoading(true);
       setErrors({});
-      const response = await http.post("/admin/login", {
+      const response = await httpAdmin.post("/admin/login", {
         email: form.email.trim(),
         password: form.password.trim(),
       });
 
-      localStorage.setItem("token", response.data.token);
-      setStatus("Dang nhap thanh cong");
+      localStorage.setItem(ADMIN_TOKEN_KEY, response.data.token);
+      localStorage.setItem(ADMIN_SESSION_EXP_KEY, String(Date.now() + SESSION_DURATION_MS));
+      setStatus("Đăng nhập thành công! Đang chuyển hướng...");
       setTimeout(() => navigate("/admin/dashboard"), 600);
     } catch (error: any) {
       console.error("Admin login error:", error);
@@ -97,7 +100,7 @@ export default function AdminLogin() {
         });
         setErrors(apiErrors);
       } else {
-        setErrors({ submit: error.response?.data?.error || "Loi khong xac dinh" });
+        setErrors({ submit: error.response?.data?.error || "Lỗi không xác định" });
       }
     } finally {
       setLoading(false);
@@ -108,7 +111,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-800 text-center">Admin Portal</h1>
-        <p className="text-center text-sm text-slate-500 mt-1">Chi danh cho tai khoan quan tri</p>
+        <p className="text-center text-sm text-slate-500 mt-1">Chỉ dành cho tài khoản quản trị</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -124,11 +127,11 @@ export default function AdminLogin() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Mat khau</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Mật khẩu</label>
             <input
               type="password"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none"
-              placeholder="Nhap mat khau"
+              placeholder="Nhập mật khẩu"
               value={form.password}
               onChange={(e) => handleChange("password", e.target.value)}
             />
@@ -151,12 +154,12 @@ export default function AdminLogin() {
             disabled={loading}
             className="w-full rounded-lg bg-indigo-600 py-2 text-white font-semibold hover:bg-indigo-700 disabled:bg-slate-400"
           >
-            {loading ? "Dang dang nhap..." : "Dang nhap"}
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
-
-        <p className="text-center text-xs text-slate-500 mt-4">Duong dan bi mat: /admin hoac /admin/login</p>
       </div>
     </div>
   );
 }
+
+

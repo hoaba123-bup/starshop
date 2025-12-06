@@ -1,25 +1,36 @@
 import { Navigate, useLocation } from "react-router-dom";
-
-const hasAdminAccess = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.role === "admin" || payload.role === "staff";
-  } catch {
-    return false;
-  }
-};
+import {
+  ADMIN_SESSION_EXP_KEY,
+  ADMIN_SESSION_NOTICE_FLAG,
+  ADMIN_TOKEN_KEY,
+} from "../../../constants/auth";
 
 const AdminProtected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
-  
-  if (!hasAdminAccess()) {
+
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+  if (!token) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
-  
-  return <>{children}</>;
+
+  const expiresAt = Number(localStorage.getItem(ADMIN_SESSION_EXP_KEY) || 0);
+  if (expiresAt && Date.now() > expiresAt) {
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(ADMIN_SESSION_EXP_KEY);
+    sessionStorage.setItem(ADMIN_SESSION_NOTICE_FLAG, "1");
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (payload.role === "admin" || payload.role === "staff") {
+      return <>{children}</>;
+    }
+  } catch {
+    // ignore
+  }
+
+  return <Navigate to="/admin/login" state={{ from: location }} replace />;
 };
 
 export default AdminProtected;

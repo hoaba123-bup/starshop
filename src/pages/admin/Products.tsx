@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { AdminApi } from "../../apis/admin.api";
 import { Product } from "../../types/product";
 import { Category } from "../../types/category";
-import { http } from "../../apis/http";
+import { httpAdmin } from "../../apis/http";
+import { ADMIN_TOKEN_KEY } from "../../constants/auth";
 
 interface ProductFormState {
   name: string;
@@ -25,7 +26,7 @@ const initialForm: ProductFormState = {
 };
 
 const getRoleFromToken = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) return "user";
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -65,7 +66,7 @@ export default function Products() {
 
   const fetchCategories = async () => {
     try {
-      const res = await http.get<Category[]>("/categories");
+      const res = await httpAdmin.get<Category[]>("/categories");
       setCategories(res.data || []);
     } catch (err) {
       console.error(err);
@@ -87,7 +88,7 @@ export default function Products() {
       setProducts(res.data || []);
     } catch (err) {
       console.error(err);
-      setError("Khong tai duoc danh sach san pham.");
+      setError("Không tải được danh sách sản phẩm.");
     } finally {
       setLoading(false);
     }
@@ -124,13 +125,13 @@ export default function Products() {
   };
 
   const handleDelete = async (product: Product) => {
-    if (!window.confirm(`Xoa san pham "${product.name}"?`)) return;
+    if (!window.confirm(`Xóa sản phẩm "${product.name}"?`)) return;
     try {
       await AdminApi.products.remove(product.id);
       setProducts((prev) => prev.filter((p) => String(p.id) !== String(product.id)));
     } catch (err) {
       console.error(err);
-      setMessage("Khong the xoa san pham.");
+      setMessage("Không thể xóa sản phẩm.");
     }
   };
 
@@ -142,9 +143,9 @@ export default function Products() {
         name: product.name,
         price: product.price,
         stock: product.stock ?? 0,
-        categoryId: product.categoryId ?? null,
-        description: product.description ?? null,
-        imageUrl: product.imageUrl ?? null,
+        categoryId: product.categoryId ?? undefined,
+        description: product.description ?? undefined,
+        imageUrl: product.imageUrl ?? undefined,
         status: nextStatus,
       };
       const res = await AdminApi.products.update(product.id, payload);
@@ -155,7 +156,7 @@ export default function Products() {
       setMessage("");
     } catch (err) {
       console.error(err);
-      setMessage("Khong cap nhat duoc trang thai.");
+      setMessage("Không cập nhật được trạng thái.");
     }
   };
 
@@ -167,13 +168,13 @@ export default function Products() {
       name: form.name.trim(),
       price: Number(form.price) || 0,
       stock: Number(form.stock) || 0,
-      categoryId: form.categoryId ? Number(form.categoryId) : null,
-      description: form.description.trim() || null,
-      imageUrl: form.imageUrl.trim() || null,
+      categoryId: form.categoryId ? Number(form.categoryId) : undefined,
+      description: form.description.trim() || undefined,
+      imageUrl: form.imageUrl.trim() || undefined,
       status: form.status,
     };
     if (!payload.name || !payload.price) {
-      setMessage("Vui long nhap ten va gia san pham.");
+      setMessage("Vui lòng nhập tên và giá sản phẩm.");
       setSaving(false);
       return;
     }
@@ -193,7 +194,7 @@ export default function Products() {
       closeModal();
     } catch (err) {
       console.error(err);
-      setMessage("Khong luu duoc san pham. Vui long thu lai.");
+      setMessage("Không lưu được sản phẩm. Vui lòng thử lại.");
     } finally {
       setSaving(false);
     }
@@ -226,9 +227,9 @@ export default function Products() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Quan ly san pham</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Quản lý sản phẩm</h1>
           <p className="text-sm text-slate-600 mt-1">
-            Them moi, chinh sua hoac xoa san pham trong cua hang
+            Thêm mới, chỉnh sửa và quản lý sản phẩm trong cửa hàng
           </p>
         </div>
         {canManage && (
@@ -236,7 +237,7 @@ export default function Products() {
             className="rounded-lg bg-indigo-600 px-5 py-2 text-white font-semibold hover:bg-indigo-700"
             onClick={() => openModal()}
           >
-            + Them san pham
+            + Thêm sản phẩm
           </button>
         )}
       </div>
@@ -244,7 +245,7 @@ export default function Products() {
       <div className="flex flex-wrap gap-3">
         <input
           className="w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Tim theo ten hoac mo ta..."
+          placeholder="Tìm theo tên..."
           value={filters.q}
           onChange={(e) => setFilters((prev) => ({ ...prev, q: e.target.value }))}
         />
@@ -253,16 +254,16 @@ export default function Products() {
           value={filters.status}
           onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
         >
-          <option value="all">Tat ca trang thai</option>
-          <option value="active">Dang hien thi</option>
-          <option value="inactive">Dang an</option>
+          <option value="all">Tất cả thạng thái</option>
+          <option value="active">Đang hiển thị</option>
+          <option value="inactive">Đang ẩn</option>
         </select>
         <select
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
           value={filters.categoryId}
           onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
         >
-          <option value="">Tat ca danh muc</option>
+          <option value="">Tất cả danh mục</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
@@ -273,7 +274,7 @@ export default function Products() {
           type="number"
           min={0}
           className="w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Gia toi thieu"
+          placeholder="Giá tối thiểu"
           value={filters.minPrice}
           onChange={(e) => setFilters((prev) => ({ ...prev, minPrice: e.target.value }))}
         />
@@ -281,7 +282,7 @@ export default function Products() {
           type="number"
           min={0}
           className="w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Gia toi da"
+          placeholder="Giá tối đa"
           value={filters.maxPrice}
           onChange={(e) => setFilters((prev) => ({ ...prev, maxPrice: e.target.value }))}
         />
@@ -306,12 +307,12 @@ export default function Products() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left">
-              <th className="py-3 px-4 font-semibold text-slate-600">San pham</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Danh muc</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Gia</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Ton kho</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Trang thai</th>
-              <th className="py-3 px-4 font-semibold text-slate-600 text-center">Hanh dong</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Sản phẩm</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Danh mục</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Giá</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Tồn kho</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Trạng thái</th>
+              <th className="py-3 px-4 font-semibold text-slate-600 text-center">Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -324,7 +325,7 @@ export default function Products() {
             ) : filteredProducts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500">
-                  Khong co san pham phu hop.
+                  Không có sản phẩm phù hợp.
                 </td>
               </tr>
             ) : (
@@ -344,7 +345,7 @@ export default function Products() {
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {product.status === "active" ? "Dang ban" : "Dang an"}
+                      {product.status === "active" ? "Đang bán" : "Đang ẩn"}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-center">
@@ -360,7 +361,7 @@ export default function Products() {
                           className="text-amber-600 text-xs font-semibold hover:underline"
                           onClick={() => handleToggleStatus(product)}
                         >
-                          {product.status === "active" ? "An" : "Hien"}
+                          {product.status === "active" ? "Ẩn" : "Hiện"}
                         </button>
                         <button
                           className="text-rose-600 text-xs font-semibold hover:underline"
@@ -370,7 +371,7 @@ export default function Products() {
                         </button>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400">Chi xem</span>
+                      <span className="text-xs text-slate-400">Chỉ xem</span>
                     )}
                   </td>
                 </tr>
@@ -385,7 +386,7 @@ export default function Products() {
           <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800">
-                {editing ? "Chinh sua san pham" : "Them san pham moi"}
+                {editing ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
               </h2>
               <button
                 className="text-slate-500 hover:text-rose-600"
@@ -402,7 +403,7 @@ export default function Products() {
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Ten san pham</label>
+                  <label className="text-xs font-semibold text-slate-600">Tên sản phẩm</label>
                   <input
                     className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                     value={form.name}
@@ -410,7 +411,7 @@ export default function Products() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Gia (VND)</label>
+                  <label className="text-xs font-semibold text-slate-600">Giá (VND)</label>
                   <input
                     type="number"
                     min={0}
@@ -420,7 +421,7 @@ export default function Products() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Ton kho</label>
+                  <label className="text-xs font-semibold text-slate-600">Tồn kho</label>
                   <input
                     type="number"
                     min={0}
@@ -430,13 +431,13 @@ export default function Products() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Danh muc</label>
+                  <label className="text-xs font-semibold text-slate-600">Danh mục</label>
                   <select
                     className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                     value={form.categoryId}
                     onChange={(e) => handleChange("categoryId", e.target.value)}
                   >
-                    <option value="">Khong phan loai</option>
+                    <option value="">Không phân loại</option>
                     {categories.map((category) => (
                       <option key={category.id} value={String(category.id)}>
                         {category.name}
@@ -446,7 +447,7 @@ export default function Products() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-600">Mo ta</label>
+                <label className="text-xs font-semibold text-slate-600">Mô tả</label>
                 <textarea
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                   rows={3}
@@ -456,7 +457,7 @@ export default function Products() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Anh</label>
+                  <label className="text-xs font-semibold text-slate-600">Ảnh</label>
                   <input
                     className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                     placeholder="https://..."
@@ -465,14 +466,14 @@ export default function Products() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-600">Trang thai</label>
+                  <label className="text-xs font-semibold text-slate-600">Trạng thái</label>
                   <select
                     className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                     value={form.status}
                     onChange={(e) => handleChange("status", e.target.value)}
                   >
-                    <option value="active">Dang ban</option>
-                    <option value="inactive">Dang an</option>
+                    <option value="active">Đang bán</option>
+                    <option value="inactive">Đang ẩn</option>
                   </select>
                 </div>
               </div>
@@ -482,14 +483,14 @@ export default function Products() {
                   className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600"
                   onClick={closeModal}
                 >
-                  Huy
+                  Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
                   className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:bg-slate-400"
                 >
-                  {saving ? "Dang luu..." : "Luu"}
+                  {saving ? "Đang lưu..." : "Lưu"}
                 </button>
               </div>
             </form>
@@ -499,3 +500,7 @@ export default function Products() {
     </div>
   );
 }
+
+
+
+

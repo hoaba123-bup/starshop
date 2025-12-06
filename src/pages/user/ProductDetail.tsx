@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { addToCart } from "../../utils/cart";
 import { http } from "../../apis/http";
 import { Product } from "../../types/product";
+<<<<<<< HEAD
 // **********************************
 // IMPORT COMPONENT TOAST MỚI
 // **********************************
@@ -329,3 +330,4 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
      </div>
    );
 }
+

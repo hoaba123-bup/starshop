@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminApi } from "../../apis/admin.api";
 import { Order } from "../../types/order";
+import { useAppMessage } from "../../hooks/useAppMessage";
 
 const statusBadge: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -30,7 +31,7 @@ export default function Orders() {
       setOrders(res.data || []);
     } catch (err) {
       console.error(err);
-      setError("Khong tai duoc danh sach don hang.");
+      setError("Không tải được danh sách đơn hàng.");
     } finally {
       setLoading(false);
     }
@@ -44,6 +45,8 @@ export default function Orders() {
       console.error(err);
     }
   };
+
+  const notify = useAppMessage();
 
   const updateStatus = async (order: Order, status: string) => {
     if (order.status === status) return;
@@ -59,7 +62,7 @@ export default function Orders() {
       }
     } catch (err) {
       console.error(err);
-      alert("Khong cap nhat duoc trang thai.");
+      notify.error("Không thể cập nhật trạng thái đơn hàng.");
     } finally {
       setUpdating(false);
     }
@@ -68,16 +71,16 @@ export default function Orders() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Quan ly don hang</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Quản lý đơn hàng</h1>
         <p className="text-sm text-slate-600 mt-1">
-          Theo doi trang thai va duyet don theo thoi gian thuc
+          Theo dõi trạng thái và duyệt đơn theo thời gian thực
         </p>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <input
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Tim ma don, ten khach, email..."
+          placeholder="Tìm mã đơn..."
           value={filters.q}
           onChange={(e) => setFilters((prev) => ({ ...prev, q: e.target.value }))}
         />
@@ -86,10 +89,10 @@ export default function Orders() {
           value={filters.status}
           onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
         >
-          <option value="all">Tat ca</option>
-          <option value="pending">Cho duyet</option>
-          <option value="approved">Da duyet</option>
-          <option value="cancelled">Da huy</option>
+          <option value="all">Tất cả</option>
+          <option value="pending">Chờ duyệt</option>
+          <option value="approved">Đã duyệt</option>
+          <option value="cancelled">Đã hủy</option>
         </select>
       </div>
 
@@ -103,25 +106,25 @@ export default function Orders() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left">
-              <th className="py-3 px-4 font-semibold text-slate-600">Ma don</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Khach hang</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Tong tien</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Trang thai</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Ngay tao</th>
-              <th className="py-3 px-4 font-semibold text-slate-600 text-center">Hanh dong</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Mã đơn</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Khách hàng</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Tổng tiền</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Trạng thái</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Ngày tạo</th>
+              <th className="py-3 px-4 font-semibold text-slate-600 text-center">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500">
-                  Dang tai...
+                  Đang tải...
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500">
-                  Khong co don hang phu hop.
+                  Không có đơn hàng phù hợp.
                 </td>
               </tr>
             ) : (
@@ -129,7 +132,7 @@ export default function Orders() {
                 <tr key={order.id} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="py-3 px-4 font-semibold text-slate-800">{order.code}</td>
                   <td className="py-3 px-4 text-slate-600">
-                    {order.customerName || order.accountName || "Khach le"}
+                    {order.customerName || order.accountName || "Khách lẻ"}
                   </td>
                   <td className="py-3 px-4 font-medium text-slate-800">
                     {Number(order.totalAmount).toLocaleString("vi-VN")} VND
@@ -161,14 +164,14 @@ export default function Orders() {
                         disabled={order.status === "approved" || updating}
                         onClick={() => updateStatus(order, "approved")}
                       >
-                        Duyet
+                        Duyệt
                       </button>
                       <button
                         className="text-rose-600 text-xs font-semibold hover:underline disabled:text-slate-400"
                         disabled={order.status === "cancelled" || updating}
                         onClick={() => updateStatus(order, "cancelled")}
                       >
-                        Huy
+                        Hủy
                       </button>
                     </div>
                   </td>
@@ -185,10 +188,10 @@ export default function Orders() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-slate-800">
-                  Chi tiet don {selected.code}
+                  Chi tiết đơn {selected.code}
                 </h2>
                 <p className="text-sm text-slate-500">
-                  Khach: {selected.customerName} - {selected.customerPhone}
+                  Khách: {selected.customerName} - {selected.customerPhone}
                 </p>
               </div>
               <button
@@ -200,7 +203,7 @@ export default function Orders() {
             </div>
 
             <div className="rounded-xl border border-slate-200 p-4">
-              <h3 className="text-sm font-semibold text-slate-700 mb-2">San pham</h3>
+              <h3 className="text-sm font-semibold text-slate-700 mb-2">Sản phẩm</h3>
               <div className="space-y-2 text-sm">
                 {selected.items?.map((item) => (
                   <div
@@ -226,17 +229,17 @@ export default function Orders() {
 
             <div className="grid gap-4 sm:grid-cols-2 text-sm text-slate-600">
               <div>
-                <p className="font-semibold text-slate-700">Thong tin khach</p>
+                <p className="font-semibold text-slate-700">Thông tin khách</p>
                 <p>{selected.customerName}</p>
                 <p>{selected.customerEmail}</p>
                 <p>{selected.shippingAddress}</p>
               </div>
               <div>
-                <p className="font-semibold text-slate-700">Phuong thuc</p>
-                <p>Thanh toan: {selected.paymentMethod}</p>
-                <p>Trang thai: {selected.status}</p>
+                <p className="font-semibold text-slate-700">Phương thức</p>
+                <p>Thanh toán: {selected.paymentMethod}</p>
+                <p>Trạng thái: {selected.status}</p>
                 <p>
-                  Ngay tao: {selected.createdAt
+                  Ngày tạo: {selected.createdAt
                     ? new Date(selected.createdAt).toLocaleString("vi-VN")
                     : "-"}
                 </p>
@@ -248,21 +251,21 @@ export default function Orders() {
                 className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
                 onClick={() => setSelected(null)}
               >
-                Dong
+                Đóng
               </button>
               <button
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-400"
                 disabled={selected.status === "approved" || updating}
                 onClick={() => updateStatus(selected, "approved")}
               >
-                Duyet don
+                Duyệt đơn
               </button>
               <button
                 className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-400"
                 disabled={selected.status === "cancelled" || updating}
                 onClick={() => updateStatus(selected, "cancelled")}
               >
-                Huy don
+                Hủy đơn
               </button>
             </div>
           </div>

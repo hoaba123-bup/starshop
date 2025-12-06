@@ -1,23 +1,30 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/ThemeToggle";
+
 import React from 'react';
 import '../../user/css/MinimalistMenu.css';
 import Footer from "./Footer";
+
+import { USER_SESSION_EXP_KEY, USER_SESSION_NOTICE_FLAG, USER_TOKEN_KEY } from "../../../constants/auth";
+
 
 const navLink = "text-sm font-medium text-white hover:text-white/80 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-white hover:after:w-full after:transition-all";
 
 export default function UserLayout() {
   const navigate = useNavigate();
-  const isAuthenticated = !!localStorage.getItem("token");
+  const isAuthenticated = !!localStorage.getItem(USER_TOKEN_KEY);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(USER_TOKEN_KEY);
+    localStorage.removeItem(USER_SESSION_EXP_KEY);
+    sessionStorage.removeItem(USER_SESSION_NOTICE_FLAG);
     navigate("/sign-in");
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <header className="sticky top-0 z-40 bg-[#432DD7] text-white">
+
   <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
   <Link to="/" className="flex items-center image-logo"> 
       <img 
@@ -80,6 +87,7 @@ export default function UserLayout() {
   </div>
 </header>
 
+
       <main className="mx-auto max-w-6xl px-4 py-6 flex-1 w-full">
         <Outlet />
       </main>
@@ -89,3 +97,4 @@ export default function UserLayout() {
     </div>
   );
 }
+

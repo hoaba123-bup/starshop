@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AdminApi } from "../../apis/admin.api";
+import { ADMIN_TOKEN_KEY } from "../../constants/auth";
 import { User } from "../../types/user";
+import { useAppMessage } from "../../hooks/useAppMessage";
 
 const getRoleFromToken = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) return "user";
   try {
     return JSON.parse(atob(token.split(".")[1])).role || "user";
@@ -34,11 +36,13 @@ export default function Customers() {
       setCustomers(res.data || []);
     } catch (err) {
       console.error(err);
-      setError("Khong tai duoc danh sach khach hang.");
+      setError("Không tải được danh sách khách hàng.");
     } finally {
       setLoading(false);
     }
   };
+
+  const notify = useAppMessage();
 
   const toggleRole = async (user: User) => {
     const nextRole = user.role === "staff" ? "user" : "staff";
@@ -51,7 +55,7 @@ export default function Customers() {
       );
     } catch (err) {
       console.error(err);
-      alert("Khong cap nhat duoc quyen.");
+      notify.error("Không cập nhật được quyền.");
     } finally {
       setUpdatingId(null);
     }
@@ -60,16 +64,16 @@ export default function Customers() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Khach hang & nhan vien</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Khách hàng & nhân viên</h1>
         <p className="text-sm text-slate-600 mt-1">
-          Quan ly thong tin va phan quyen tai khoan
+          Quản lý thông tin và phân quyền người dùng
         </p>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <input
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          placeholder="Tim theo ten, email, so dien thoai..."
+          placeholder="Tìm theo tên..."
           value={filters.q}
           onChange={(e) => setFilters({ q: e.target.value })}
         />
@@ -85,13 +89,12 @@ export default function Customers() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left">
-              <th className="py-3 px-4 font-semibold text-slate-600">Khach hang</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Lien he</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Quyen</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Don hang</th>
-              <th className="py-3 px-4 font-semibold text-slate-600">Da chi</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Khách hàng</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Liên hệ</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Quyền</th>
+              <th className="py-3 px-4 font-semibold text-slate-600">Đơn hàng</th>
               <th className="py-3 px-4 font-semibold text-slate-600 text-center">
-                Hanh dong
+                Hành động
               </th>
             </tr>
           </thead>
@@ -99,13 +102,13 @@ export default function Customers() {
             {loading ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500">
-                  Dang tai...
+                  Đang tải...
                 </td>
               </tr>
             ) : customers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-500">
-                  Khong co tai khoan phu hop.
+                  Không tìm thấy khách hàng nào.
                 </td>
               </tr>
             ) : (
@@ -116,7 +119,7 @@ export default function Customers() {
                   </td>
                   <td className="py-3 px-4 text-slate-600">
                     <p>{customer.email}</p>
-                    <p>{customer.phone || "Chua cap nhat"}</p>
+                    <p>{customer.phone || "Chưa cập nhật"}</p>
                   </td>
                   <td className="py-3 px-4">
                     <span
@@ -132,9 +135,6 @@ export default function Customers() {
                   <td className="py-3 px-4 text-slate-600">
                     {customer.totalOrders ?? 0}
                   </td>
-                  <td className="py-3 px-4 font-semibold text-slate-800">
-                    {Number(customer.totalSpent ?? 0).toLocaleString("vi-VN")} VND
-                  </td>
                   <td className="py-3 px-4 text-center">
                     {canUpdateRole ? (
                       <button
@@ -142,10 +142,10 @@ export default function Customers() {
                         disabled={updatingId === customer.id}
                         onClick={() => toggleRole(customer)}
                       >
-                        {customer.role === "staff" ? "Chuyen ve user" : "Nang thanh staff"}
+                        {customer.role === "staff" ? "Chuyển về user" : "Nâng thành staff"}
                       </button>
                     ) : (
-                      <span className="text-xs text-slate-400">Chi xem</span>
+                      <span className="text-xs text-slate-400">Chỉ xem</span>
                     )}
                   </td>
                 </tr>
@@ -157,3 +157,8 @@ export default function Customers() {
     </div>
   );
 }
+
+
+
+
+

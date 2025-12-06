@@ -394,7 +394,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     const existing = (await queryDatabase("SELECT id FROM users WHERE email = ?", [email])) as any[];
     if (existing?.length) {
-      return res.status(400).json({ errors: [{ field: "email", message: "Email da ton tai" }] });
+      return res.status(400).json({ errors: [{ field: "email", message: "Email đã tồn tại" }] });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -405,7 +405,7 @@ app.post("/api/auth/register", async (req, res) => {
     );
 
     const token = generateToken(0, email, "user");
-    res.status(201).json({ message: "Dang ky thanh cong", token, user: { fullName, email, role: "user" } });
+    res.status(201).json({ message: "Đăng ký thành công", token, user: { fullName, email, role: "user" } });
   } catch (error) {
     console.error("Register error", error);
     res.status(500).json({ error: "Server error" });
@@ -419,19 +419,19 @@ app.post("/api/auth/login", async (req, res) => {
     if (errors.length) return res.status(400).json({ errors });
 
     const rows = (await queryDatabase("SELECT * FROM users WHERE email = ?", [email])) as any[];
-    if (!rows?.length) return res.status(401).json({ errors: [{ field: "email", message: "Tai khoan khong ton tai" }] });
+    if (!rows?.length) return res.status(401).json({ errors: [{ field: "email", message: "Tài khoản không tồn tại" }] });
 
     const user = rows[0];
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ errors: [{ field: "password", message: "Mat khau khong dung" }] });
+    if (!ok) return res.status(401).json({ errors: [{ field: "password", message: "Mật khẩu không đúng" }] });
 
     if (user.status && user.status !== "active") {
-      return res.status(403).json({ errors: [{ field: "email", message: "Tai khoan dang bi khoa" }] });
+      return res.status(403).json({ errors: [{ field: "email", message: "Tài khoản đang bị khóa" }] });
     }
 
     const token = generateToken(user.id, user.email, user.role);
     res.json({
-      message: "Dang nhap thanh cong",
+      message: "Đăng nhập thành công",
       token,
       user: { id: user.id, fullName: user.fullName, email: user.email, role: user.role, phone: user.phone },
     });
@@ -448,22 +448,22 @@ app.post("/api/admin/login", async (req, res) => {
     if (errors.length) return res.status(400).json({ errors });
 
     const rows = (await queryDatabase("SELECT * FROM users WHERE email = ?", [email])) as any[];
-    if (!rows?.length) return res.status(401).json({ errors: [{ field: "email", message: "Tai khoan khong ton tai" }] });
+    if (!rows?.length) return res.status(401).json({ errors: [{ field: "email", message: "Tài khoản không tồn tại" }] });
 
     const admin = rows[0];
     if (!["admin", "staff"].includes(admin.role)) {
-      return res.status(403).json({ errors: [{ field: "email", message: "Tai khoan khong co quyen" }] });
+      return res.status(403).json({ errors: [{ field: "email", message: "Tài khoản không có quyền" }] });
     }
 
     if (admin.status && admin.status !== "active") {
-      return res.status(403).json({ errors: [{ field: "email", message: "Tai khoan dang bi khoa" }] });
+      return res.status(403).json({ errors: [{ field: "email", message: "Tài khoản đang bị khóa" }] });
     }
 
     const ok = await bcrypt.compare(password, admin.password);
-    if (!ok) return res.status(401).json({ errors: [{ field: "password", message: "Mat khau khong dung" }] });
+    if (!ok) return res.status(401).json({ errors: [{ field: "password", message: "Mật khẩu không đúng" }] });
 
     const token = generateToken(admin.id, admin.email, admin.role);
-    res.json({ message: "Dang nhap quan tri thanh cong", token, user: { id: admin.id, fullName: admin.fullName, email: admin.email, role: admin.role } });
+    res.json({ message: "Đăng nhập quản trị thành công", token, user: { id: admin.id, fullName: admin.fullName, email: admin.email, role: admin.role } });
   } catch (error) {
     console.error("Admin login error", error);
     res.status(500).json({ error: "Server error" });
@@ -488,9 +488,24 @@ app.put("/api/auth/me", authMiddleware, async (req, res) => {
     const { fullName, phone } = req.body;
     if (!fullName?.trim()) return res.status(400).json({ error: "Full name is required" });
 
-    await queryDatabase("UPDATE users SET fullName = ?, phone = ? WHERE id = ?", [fullName.trim(), phone ?? null, session.userId]);
-    const rows = (await queryDatabase("SELECT id, fullName, email, phone, role FROM users WHERE id = ?", [session.userId])) as any[];
-    res.json(rows[0]);
+    await queryDatabase("UPDATE users SET fullName = ?, phone = ? WHERE id = ?", [
+      fullName.trim(),
+      phone ?? null,
+      session.userId,
+    ]);
+    const rows = (await queryDatabase("SELECT id, fullName, email, phone, role FROM users WHERE id = ?", [
+      session.userId,
+    ])) as any[];
+    if (!rows?.length) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const updatedUser = rows[0];
+    await queryDatabase(
+      "UPDATE orders SET customerName = ?, customerEmail = ?, customerPhone = ? WHERE userId = ?",
+      [updatedUser.fullName, updatedUser.email, updatedUser.phone ?? null, session.userId]
+    );
+    res.json(updatedUser);
   } catch (error) {
     console.error("Update profile error", error);
     res.status(500).json({ error: "Server error" });
@@ -746,7 +761,7 @@ app.post("/api/admin/products/import", authMiddleware, requireAdmin, async (req,
   try {
     const items = Array.isArray(req.body?.items) ? req.body.items : [];
     if (!items.length) {
-      return res.status(400).json({ error: "Danh sach items khong hop le" });
+      return res.status(400).json({ error: "Danh sách items không hợp lệ" });
     }
     let inserted = 0;
     let updated = 0;
@@ -879,7 +894,7 @@ app.post("/api/admin/orders/import", authMiddleware, requireAdmin, async (req, r
   try {
     const orders = Array.isArray(req.body?.orders) ? req.body.orders : [];
     if (!orders.length) {
-      return res.status(400).json({ error: "Danh sach don hang khong hop le" });
+      return res.status(400).json({ error: "Danh sách đơn hàng không hợp lệ" });
     }
     let imported = 0;
     for (const orderInput of orders) {
@@ -919,7 +934,7 @@ app.post("/api/admin/orders/import", authMiddleware, requireAdmin, async (req, r
           [
             orderInput.code || buildOrderCode(),
             orderInput.userId || null,
-            orderInput.customerName || "Khach hang",
+            orderInput.customerName || "Khách hàng",
             orderInput.customerEmail || "",
             orderInput.customerPhone || "",
             orderInput.shippingAddress || "",

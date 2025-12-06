@@ -4,6 +4,7 @@ import { addToCart } from "../../utils/cart";
 import { http } from "../../apis/http";
 import { Product } from "../../types/product";
 import { Category } from "../../types/category";
+
 import "./css/AddToCartButton.css";
 import { gsap } from "gsap";
 import Toast from './Toast';
@@ -57,6 +58,9 @@ const ToastModal = ({ message, type, onClose }: { message: string; type: "succes
   );
 };
 
+
+
+
 export default function Home() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
@@ -67,7 +71,6 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -97,7 +100,7 @@ export default function Home() {
         setProducts(res.data || []);
       } catch (err) {
         console.error(err);
-        setError("Khong tai duoc danh sach san pham");
+        setError("Không tải được danh sách sản phẩm.");
       } finally {
         setLoading(false);
       }
@@ -132,6 +135,7 @@ export default function Home() {
     // Đảm bảo nút đang ở trạng thái active
     button.classList.add('active');
 
+<<<<<<< HEAD
     // Animation 1: Background scale
     gsap.to(button, {
         keyframes: [{
@@ -333,8 +337,10 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
                 </div>
             </section>
 
-      {loading && <p className="text-sm text-slate-600">Dang tai san pham...</p>}
+
+      {loading && <p className="text-sm text-slate-600">Đang tải sản phẩm...</p>}
       {error && <p className="text-sm text-rose-600">{error}</p>}
+
     {toast?.message && (
         <Toast
           message={toast.message}
@@ -342,6 +348,7 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
           onClose={() => setToast(null)} 
         />
       )}
+
 
       {!loading && !error && categories.map((cat) => {
         const list = grouped[String(cat.id)] || [];
@@ -401,6 +408,7 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
                       const result = addToCart(p, 1); 
                       
                       if (result.success) {
+
                           // 4. Bắt đầu animation nếu thêm vào giỏ thành công
                           runAddToCartAnimation(button);
                           handleToast("Đã thêm sản phẩm vào giỏ hàng", "success");
@@ -458,9 +466,10 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
                         {/* Cart body (stroke) */}
                        <path d="M1 2.5H6L10 18.5H25.5L28.5 7.5L7.5 7.5" className="shape" />
                     <path d="M11.5 25C12.6046 25 13.5 24.1046 13.5 23C13.5 21.8954 12.6046 21 11.5 21C10.3954 21 9.5 21.8954 9.5 23C9.5 24.1046 10.3954 25 11.5 25Z" className="wheel" />
-                    <path d="M24 25C25.1046 25 26 24.1046 26 23C26 21.8954 25.1046 21 24 21C22.8954 21 22 21.8954 22 23C22 24.1046 22.8954 25 24 25Z" class="wheel" />
+                    <path d="M24 25C25.1046 25 26 24.1046 26 23C26 21.8954 25.1046 21 24 21C22.8954 21 22 21.8954 22 23C22 24.1046 22.8954 25 24 25Z" className="wheel" />
                     <path d="M14.5 13.5L16.5 15.5L21.5 10.5" className="tick" />
                     </svg>
+
                   </button>
                   {/* END: Nút Thêm vào giỏ đã được làm sạch */}
 
