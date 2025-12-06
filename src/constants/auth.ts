@@ -6,5 +6,5 @@ export const ADMIN_SESSION_EXP_KEY = "starshop_admin_session_exp";
 export const USER_SESSION_NOTICE_FLAG = "starshop_user_session_expired_notice";
 export const ADMIN_SESSION_NOTICE_FLAG = "starshop_admin_session_expired_notice";
 
-export const SESSION_DURATION_MS = 20 * 60 * 60 * 1000; // 20 hours
+export const SESSION_DURATION_MS =20 * 60 * 60 * 1000; // 20 hours * 60 minutes * 60 seconds * 1000 milliseconds
 
