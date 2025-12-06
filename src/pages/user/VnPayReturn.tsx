@@ -89,7 +89,7 @@ const VnPayReturn: React.FC = () => {
                 </p>
                 <div className="mt-8">
                     <button
-                        onClick={() => window.location.href = '/orders'}
+                        onClick={() => window.location.href = '/profile/orders'}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
                     >
                         Xem Đơn Hàng Của Bạn

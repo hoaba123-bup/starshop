@@ -69,7 +69,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`fixed top-5 right-5 z-50 max-w-xs p-4 rounded-lg shadow-2xl text-white ${bgColor} 
+      className={`fixed top-5 right-5 z-50 max-w-xs p-2 pt-1 pb-1 rounded-lg shadow-2xl text-white ${bgColor} 
                   transform transition-all duration-300 ease-out 
                   ${transformClass}`}
       role="alert"
@@ -79,12 +79,10 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
           <span className="mr-2 text-white">
             <IconComponent />
           </span>
-          <p className="font-medium text-sm">{message}</p>
+          <p className="font-medium text-sm pt-3">{message}</p>
         </div>
         <button
-          onClick={handleCloseClick} // Dùng handler mới
-          className="ml-4 p-1 text-white/80 hover:text-white transition-colors focus:outline-none"
-          aria-label="Đóng thông báo"
+         className="ml-4 p-1  flex items-center justify-center text-white/80 hover:text-white transition-colors focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>

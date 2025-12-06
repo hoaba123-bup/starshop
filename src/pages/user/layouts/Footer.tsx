@@ -69,7 +69,7 @@ export default function Footer() {
                         <div className="social-login-icons">
             
             {/* 1. Twitter / X */}
-            <div className="socialcontainer">
+            <a href="https://x.com/hoanguyenba2?s=21" target="_blank">  <div className="socialcontainer">
                 <div className="icon social-icon-1-1">
                     <SocialIconSvg
                         path={twitterPath}
@@ -86,10 +86,11 @@ export default function Footer() {
                         height="1.7em"
                     />
                 </div>
-            </div>
+            </div></a>
+          
 
             {/* 2. Instagram */}
-            <div className="socialcontainer">
+            <a href="https://www.instagram.com/hoaa_naaa?fbclid=IwY2xjawOhi-hleHRuA2FlbQIxMABicmlkETE4VlRIUElTZ25mOGpleVZvc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHuuHrjER69xeD2jziZXUXiHQvn7LMfiL71k4jaDbQU45uz44F_IAK26uVGI1_aem_Rhd2VjSimGriwbM7wpoboA" target="_blank" rel="noopener noreferrer"><div className="socialcontainer">
                 <div className="icon social-icon-2-2">
                     <SocialIconSvg
                         path={instagramPath}
@@ -106,10 +107,9 @@ export default function Footer() {
                         height="1.5em"
                     />
                 </div>
-            </div>
-
-            {/* 3. Facebook */}
-            <div className="socialcontainer">
+            </div></a>
+            
+<a href="https://www.facebook.com/share/17dL5NYxiE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">  <div className="socialcontainer">
                 <div className="icon social-icon-3-3">
                     <SocialIconSvg
                         path={facebookPath}
@@ -126,10 +126,10 @@ export default function Footer() {
                         height="1.6em"
                     />
                 </div>
-            </div>
-
-            {/* 4. Github / Khác */}
-            <div className="socialcontainer">
+            </div></a>
+            {/* 3. Facebook */}
+          
+<a href="https://github.com/Hoaba-clouch" target="_blank" rel="noopener noreferrer">  <div className="socialcontainer">
                 <div className="icon social-icon-4-4">
                     <SocialIconSvg
                         path={githubPath}
@@ -146,7 +146,9 @@ export default function Footer() {
                         height="1.6em"
                     />
                 </div>
-            </div>
+            </div></a>
+            {/* 4. Github / Khác */}
+          
         </div>
                         {/* Nút Đăng ký nhận tin: Tăng tương phản và độ rộng */}
                        

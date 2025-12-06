@@ -43,7 +43,7 @@ const [form, setForm] = useState({
     if (!/^\d{9,11}$/.test(form.phone)) errs.push("Số điện thoại từ 9 đến 11 chữ số");
     if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.push("Email không đúng định dạng");
     if (!form.address.trim()) errs.push("Vui lòng nhập địa chỉ");
-    if (form.payment === "bank") errs.push("Thanh toán chuyển khoản đang được phát triển");
+    
     if (!cart.length) errs.push("Giỏ hàng trống");
     return errs;
   };

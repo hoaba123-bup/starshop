@@ -15,49 +15,49 @@ declare global {
   }
 }
 
-const ToastModal = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => {
-  const isSuccess = type === "success";
+// const ToastModal = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => {
+//   const isSuccess = type === "success";
 
-  return (
-    // Backdrop (Nền mờ đen 50% + Làm mờ (Blur) + Hiệu ứng Fade In cho nền)
-    // opacity-100: trạng thái cuối của fade-in
-    <div className="fixed inset-0 z-50 flex items-center justify-center 
-                    bg-black/50 backdrop-blur-sm 
-                    transition-opacity duration-300 ease-out 
-                    opacity-100">
+//   return (
+//     // Backdrop (Nền mờ đen 50% + Làm mờ (Blur) + Hiệu ứng Fade In cho nền)
+//     // opacity-100: trạng thái cuối của fade-in
+//     <div className="fixed inset-0 z-50 flex items-center justify-center 
+//                     bg-black/50 backdrop-blur-sm 
+//                     transition-opacity duration-300 ease-out 
+//                     opacity-100">
       
-      {/* Modal Content (Hiện từ từ - Scale Up và Fade In) */}
-      {/* scale-100 opacity-100: trạng thái cuối của scale-up/fade-in */}
-      <div className="bg-white rounded-lg shadow-xl p-6 w-80 max-w-sm 
-                    transform transition-all duration-300 ease-out 
-                    dark:bg-slate-700 
-                    opacity-100 scale-100">
-        <div className={`text-center p-3 rounded-full mx-auto w-12 h-12 flex items-center justify-center ${isSuccess ? 'bg-emerald-100 dark:bg-emerald-800' : 'bg-rose-100 dark:bg-rose-800'}`}>
-          <svg className={`w-6 h-6 ${isSuccess ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            {isSuccess ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            )}
-          </svg>
-        </div>
-        <h3 className={`text-lg font-semibold text-center mt-4 ${isSuccess ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
-          {isSuccess ? "Thành công!" : "Thất bại!"}
-        </h3>
-        <p className="text-sm text-center text-slate-600 dark:text-slate-300 mt-2">{message}</p>
-        <div className="mt-5 sm:mt-6">
-          <button
-            type="button"
-            className={`inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:text-sm transition duration-150 ease-in-out ${isSuccess ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-rose-600 hover:bg-rose-700'}`}
-            onClick={onClose}
-          >
-            Đóng
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+//       {/* Modal Content (Hiện từ từ - Scale Up và Fade In) */}
+//       {/* scale-100 opacity-100: trạng thái cuối của scale-up/fade-in */}
+//       <div className="bg-white rounded-lg shadow-xl p-6 w-80 max-w-sm 
+//                     transform transition-all duration-300 ease-out 
+//                     dark:bg-slate-700 
+//                     opacity-100 scale-100">
+//         <div className={`text-center p-3 rounded-full mx-auto w-12 h-12 flex items-center justify-center ${isSuccess ? 'bg-emerald-100 dark:bg-emerald-800' : 'bg-rose-100 dark:bg-rose-800'}`}>
+//           <svg className={`w-6 h-6 ${isSuccess ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+//             {isSuccess ? (
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+//             ) : (
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+//             )}
+//           </svg>
+//         </div>
+//         <h3 className={`text-lg font-semibold text-center mt-4 ${isSuccess ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
+//           {isSuccess ? "Thành công!" : "Thất bại!"}
+//         </h3>
+//         <p className="text-sm text-center text-slate-600 dark:text-slate-300 mt-2">{message}</p>
+//         <div className="mt-5 sm:mt-6">
+//           <button
+//             type="button"
+//             className={`inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:text-sm transition duration-150 ease-in-out ${isSuccess ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-rose-600 hover:bg-rose-700'}`}
+//             onClick={onClose}
+//           >
+//             Đóng
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 
 
