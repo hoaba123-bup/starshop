@@ -269,7 +269,7 @@ app.post("/api/orders", authMiddleware, async (req, res) => {
             "INSERT INTO orders (code, userId, customerName, customerEmail, customerPhone, shippingAddress, paymentMethod, status, totalAmount, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 orderCode,
-                session.id ?? null, 
+                session?.userId ?? null, 
                 shipping.name ?? " Khách Hàng",
                 shipping.email ?? "",
                 shipping.phone ?? "",
@@ -290,9 +290,7 @@ app.post("/api/orders", authMiddleware, async (req, res) => {
         }
         
         // Nếu là COD, cập nhật trạng thái thành 'approved' ngay lập tức
-        if (paymentMethod === 'cod') {
-             await queryDatabase("UPDATE orders SET status = 'approved' WHERE id = ?", [orderId]);
-        }
+        // Keep order status as pending until admin processes it
         
         res.json({ code: orderCode });
 

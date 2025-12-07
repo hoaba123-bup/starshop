@@ -51,6 +51,13 @@ export default function Orders() {
   const updateStatus = async (order: Order, status: string) => {
     if (order.status === status) return;
     setUpdating(true);
+    const key = `order-${order.id}-${status}`;
+    notify.open({
+      type: "loading",
+      content: "Đang xử lí...",
+      key,
+      duration: 0,
+    });
     try {
       const res = await AdminApi.orders.updateStatus(order.id, status);
       const updated = res.data;
@@ -60,8 +67,18 @@ export default function Orders() {
       if (selected && String(selected.id) === String(order.id)) {
         setSelected(updated);
       }
+      notify.open({
+        type: "success",
+        content: status === "approved" ? "Đã duyệt đơn hàng" : "Hủy đơn hàng" + " thành công.",
+        key,
+      });
     } catch (err) {
       console.error(err);
+      notify.open({
+        type: "error",
+        content: "Không thể cập nhật trạng thái đơn hàng.",
+        key,
+      });
       notify.error("Không thể cập nhật trạng thái đơn hàng.");
     } finally {
       setUpdating(false);
