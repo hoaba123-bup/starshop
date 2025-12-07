@@ -326,3 +326,24 @@ body {
     /* Tăng lề trái (padding-left) để chữ không bị icon che mất */
     padding-left: 3rem !important; /* Đủ chỗ cho icon (1rem) + khoảng trống (1rem) + vị trí ban đầu (1rem) */
 }
+.btnA{
+   margin-bottom: 15PX;
+   width: fit-content;
+   font-size:0.875rem ;
+   margin-left: 20px;
+}
+.btnB{
+   margin-bottom: 15PX;
+   width: fit-content;
+   position: absolute;
+   top: 0;
+    left: 17em;
+    font-size:0.875rem ;
+}
+.flexxx{
+    display: flex;
+    position: relative;
+}
+.textt-sm{
+    font-size: 0.775rem;
+}

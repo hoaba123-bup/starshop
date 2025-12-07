@@ -19,7 +19,7 @@ const [form, setForm] = useState({
   });
   const PAYMENT_METHODS = {
     COD: 'Thanh toán khi nhận hàng (COD)',
-    // XÓA PAYOS: 'Ví điện tử & Thẻ ngân hàng (PayOS)',
+   
     VNPAY: ' Thẻ ATM & Visa/Mastercard (VNPAY)', // GIỮ LẠI
 };
   const [errors, setErrors] = useState<string[]>([]);
@@ -98,7 +98,7 @@ const handleSubmit = async (event: React.FormEvent) => {
     } catch (error) {
       
         const errorMessage = error.response?.data?.error || 'Lỗi không xác định khi tạo đơn hàng.';
-        toast.error('Lỗi khi tạo đơn hàng: ' + errorMessage);
+        notify.error('Lỗi khi tạo đơn hàng: ' + errorMessage);
         setIsSubmitting(false);
         return;
     }
@@ -111,13 +111,13 @@ const handleSubmit = async (event: React.FormEvent) => {
             
             window.location.href = orderUrl;
         } catch (error) {
-            toast.error('Lỗi khi tạo giao dịch VNPAY.');
+            notify.error('Lỗi khi tạo giao dịch VNPAY.');
             setIsSubmitting(false);
         }
     } else { // paymentMethod === 'cod'
         clearCart();
         setCart([]);
-        toast.success('Đặt hàng thành công! Đơn hàng sẽ được giao trong vài ngày tới.');
+        notify.success('Đặt hàng thành công! vui lòng chờ xác nhận từ cửa hàng.');
         // Chuyển hướng đến trang đơn hàng người dùng
         navigate('/profile/orders'); // Hoặc '/orders' tùy theo RouterSetup của huynh
     }
@@ -180,7 +180,7 @@ const handleSubmit = async (event: React.FormEvent) => {
                  <input
     type="radio"
     id="cod"
-    name="paymentMethod" // <-- PHẢI THÊM VÀ PHẢI GIỐNG NHAU
+    name="paymentMethod" 
     value="cod"
     checked={form.payment === 'cod'}
     onChange={() => handleChange('payment' as keyof typeof form, 'cod')} // <-- THÊM ONCHANGE
@@ -193,7 +193,7 @@ const handleSubmit = async (event: React.FormEvent) => {
        <input
     type="radio"
     id="vnpay"
-    name="paymentMethod" // <-- PHẢI GIỐNG VỚI CÁI TRÊN
+    name="paymentMethod" 
     value="vnpay"
     checked={form.payment === 'vnpay'}
     onChange={() => handleChange('payment' as keyof typeof form, 'vnpay')} // <-- THÊM ONCHANGE

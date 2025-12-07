@@ -69,7 +69,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`fixed top-5 right-5 z-50 max-w-xs p-2 pt-1 pb-1 rounded-lg shadow-2xl text-white ${bgColor} 
+      className={`fixed top-5 right-5 z-50 max-w-xs p-3 pt-1 pb-1 rounded-lg shadow-2xl text-white ${bgColor} 
                   transform transition-all duration-300 ease-out 
                   ${transformClass}`}
       role="alert"
