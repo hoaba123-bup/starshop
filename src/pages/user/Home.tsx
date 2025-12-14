@@ -373,7 +373,7 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
                         <div className="h-full w-full bg-slate-100" />
                       )}
                     </div>
-                    <div className="text-sm font-semibold text-slate-800">{p.name}</div>
+                    <div className="text-sm font-semibold text-slate-800 line-clamp-4 min-h-[5.2rem]">{p.name}</div>
                     <div className="text-xs text-slate-500">{p.categoryName}</div>
                     <div className="text-indigo-600 font-bold mt-1">
                       {Number(p.price).toLocaleString("vi-VN")} VND

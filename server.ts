@@ -73,6 +73,8 @@ app.use(
       "http://localhost:5174",
       "http://localhost:5176",
         "https://starshopsss.vercel.app",
+        "https://starshopps.vercel.app",
+
       "http://localhost:5177",
     ],
     credentials: true,
