@@ -28,7 +28,7 @@ export default function UserLayout() {
   <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
   <Link to="/" className="flex items-center image-logo"> 
       <img 
-        src="/public/unnamed-Photoroom.png" // <<< THAY ĐỔI ĐƯỜNG DẪN NÀY
+        src="/unnamed-Photoroom.png" // <<< THAY ĐỔI ĐƯỜNG DẪN NÀY
         alt="StarShop Logo" 
         className="h-15 w-auto" // Đặt chiều cao 8 units (khoảng 32px), w-auto giữ tỷ lệ
       />
