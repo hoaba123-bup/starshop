@@ -24,7 +24,7 @@ const VNP_TMN_CODE = 'TELPLJSU'; // Mã Merchant do VNPAY cung cấp
 const VNP_HASH_SECRET = 'RPW7QHAKGBMG5A79ZKEZ4LSEMGMGNGGV'; // Chuỗi bí mật (Secret Key) do VNPAY cung cấp
 const VNP_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const VNP_RETURN_URL = 'http://localhost:5173/payment/vnpay_return'; // URL Frontend xử lý kết quả
-const VNP_IPN_URL = 'http://localhost:5000/api/orders/vnpay_ipn'; // URL Backend nhận thông báo từ VNPAY
+const VNP_IPN_URL = 'https://demetrice-atomistical-georgene.ngrok-free.dev/api/orders/vnpay_ipn'; // URL Backend nhận thông báo từ VNPAY
 /**
  * Sắp xếp các tham số theo thứ tự bảng chữ cái (alphabetical order)
  * @param obj Object chứa các tham số VNPAY

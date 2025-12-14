@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ADMIN_TOKEN_KEY, USER_TOKEN_KEY } from "../constants/auth";
 
-const base = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
+const base = (import.meta.env.VITE_API_URL || "https://demetrice-atomistical-georgene.ngrok-free.dev/api").replace(/\/$/, "");
 
 function createHttpClient(tokenKey: string, redirectPath: string) {
   const instance = axios.create({
