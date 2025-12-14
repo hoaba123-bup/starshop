@@ -7,7 +7,10 @@ import { Category } from "../../types/category";
 
 import "./css/AddToCartButton.css";
 import { gsap } from "gsap";
-import Toast from './Toast';
+import Toast from "./Toast";
+
+const PAGE_SIZE = 12;
+const MAX_PAGE_BUTTONS = 5;
 // Khai báo lại window.MorphSVGPlugin để TypeScript biết nó tồn tại khi load bằng CDN
 declare global {
   interface Window {
@@ -72,7 +75,12 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [keyword, categoryId, minPrice, maxPrice]);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -109,15 +117,42 @@ const [toast, setToast] = useState<{ message: string; type: "success" | "error" 
     fetchProducts();
   }, [keyword, categoryId, minPrice, maxPrice]);
 
-  const grouped = useMemo(() => {
-    const map: Record<string, Product[]> = {};
-    products.forEach((p) => {
-      const key = String(p.categoryId || "others");
-      if (!map[key]) map[key] = [];
-      map[key].push(p);
-    });
-    return map;
-  }, [products]);
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil((products.length || 0) / PAGE_SIZE));
+    if (currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [products, currentPage]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil((products.length || 0) / PAGE_SIZE)),
+    [products.length]
+  );
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return products.slice(start, start + PAGE_SIZE);
+  }, [products, currentPage]);
+
+  const pageRangeLabel = useMemo(() => {
+    if (!products.length) return null;
+    const from = (currentPage - 1) * PAGE_SIZE + 1;
+    const to = Math.min(products.length, from + PAGE_SIZE - 1);
+    return { from, to };
+  }, [products.length, currentPage]);
+
+  const pageNumbers = useMemo(() => {
+    const pages: number[] = [];
+    let start = Math.max(1, currentPage - Math.floor(MAX_PAGE_BUTTONS / 2));
+    let end = Math.min(totalPages, start + MAX_PAGE_BUTTONS - 1);
+    if (end - start < MAX_PAGE_BUTTONS - 1) {
+      start = Math.max(1, end - MAX_PAGE_BUTTONS + 1);
+    }
+    for (let i = start; i <= end; i += 1) {
+      pages.push(i);
+    }
+    return pages;
+  }, [currentPage, totalPages]);
   
   // Hàm runAddToCartAnimation
  const runAddToCartAnimation = (button: HTMLElement) => {
@@ -350,19 +385,25 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
       )}
 
 
-      {!loading && !error && categories.map((cat) => {
-        const list = grouped[String(cat.id)] || [];
-        if (!list.length) return null;
-        return (
-          <div className="dark">
-          <section key={cat.id} className="space-y-3">
-            <h2 className="text-xl font-semibold text-slate-800">{cat.name}</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {list.map((p) => (
+﻿      {!loading && !error && (
+        <section className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-800">Danh sách sản phẩm</h2>
+              <p className="text-sm text-slate-500">
+                {pageRangeLabel
+                  ? `Hiển thị ${pageRangeLabel.from} - ${pageRangeLabel.to} trong ${products.length} sản phẩm`
+                  : "Không tìm thấy sản phẩm phù hợp với bộ lọc."}
+              </p>
+            </div>
+          </div>
+
+          {paginatedProducts.length ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+              {paginatedProducts.map((p) => (
                 <div
                   key={p.id}
-                  className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm flex flex-col cursor-pointer 
-             transition duration-300 transform hover:scale-[1.03] hover:shadow-xl dark:bg-slate-800 dark:border-slate-700"
+                  className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm flex flex-col cursor-pointer transition duration-300 transform hover:scale-[1.03] hover:shadow-xl dark:bg-slate-800 dark:border-slate-700"
                   onClick={() => navigate(`/product/${p.id}`)}
                 >
                   <div>
@@ -379,107 +420,115 @@ const handleToast = (msg: string, type: "success" | "error" = "success") => {
                       {Number(p.price).toLocaleString("vi-VN")} VND
                     </div>
                   </div>
-                  
-                  {/* START: Nút Thêm vào giỏ đã được làm sạch */}
+
                   <button
-                    className="add-to-cart mt-auto rounded-lg bg-indigo-600 px-3 py-2 text-white text-sm font-medium 
-             transition duration-300 transform hover:bg-indigo-700 hover:scale-[1.04] " 
+                    className="add-to-cart mt-auto rounded-lg bg-indigo-600 px-3 py-2 text-white text-sm font-medium transition duration-300 transform hover:bg-indigo-700 hover:scale-[1.04]"
                     onPointerDown={(e) => {
                       const button = e.currentTarget as HTMLElement;
-                      if (button.classList.contains('active')) return;
-                      
+                      if (button.classList.contains("active")) return;
                       gsap.to(button, {
-                          '--background-scale': .97,
-                          duration: .15
+                        "--background-scale": 0.97,
+                        duration: 0.15,
                       });
                     }}
-
                     onClick={(e) => {
-                      // 1. Dừng sự kiện lan truyền lên thẻ cha (div product)
                       e.stopPropagation();
-                      
-                      // 2. Lấy button element
-                      const button = e.currentTarget as HTMLElement; 
-                      
-                      // Ngăn chặn click nếu đang chạy animation
-                      if (button.classList.contains('active')) return;
-                      
-                      // 3. Chạy logic giỏ hàng
-                      const result = addToCart(p, 1); 
-                      
+                      const button = e.currentTarget as HTMLElement;
+                      if (button.classList.contains("active")) return;
+                      const result = addToCart(p, 1);
                       if (result.success) {
-
-                          // 4. Bắt đầu animation nếu thêm vào giỏ thành công
-                          runAddToCartAnimation(button);
-                          handleToast("Đã thêm sản phẩm vào giỏ hàng", "success");
+                        runAddToCartAnimation(button);
+                        handleToast("Đã thêm sản phẩm vào giỏ hàng", "success");
                       } else {
-                          // Xử lý khi thất bại
-                          handleToast(result.message || "Sản phẩm đã hết hàng", "error");
+                        handleToast(result.message || "Sản phẩm đã hết hàng", "error");
                       }
                     }}
                   >
                     <span>Thêm vào giỏ</span>
-                    
-                    {/* SVG cho hiệu ứng morph */}
-                   <svg className="morph" viewBox="0 0 64 13">
-                <path d="M0 12C6 12 17 12 32 12C47.9024 12 58 12 64 12V13H0V12Z" />
-            </svg>
-                    
-                    {/* Khu vực Áo */}
-                    <div className="shirt">
-                        {/* Áo phần 1 */}
-                           <svg className="first" viewBox="0 0 24 24">
-                    <path d="M4.99997 3L8.99997 1.5C8.99997 1.5 10.6901 3 12 3C13.3098 3 15 1.5 15 1.5L19 3L22.5 8L19.5 10.5L19 9.5L17.1781 18.6093C17.062 19.1901 16.778 19.7249 16.3351 20.1181C15.4265 20.925 13.7133 22.3147 12 23C10.2868 22.3147 8.57355 20.925 7.66487 20.1181C7.22198 19.7249 6.93798 19.1901 6.82183 18.6093L4.99997 9.5L4.5 10.5L1.5 8L4.99997 3Z" />
-                            {/* Logo Group */}
-                            <g>
-                               <path d="M16.3516 9.65383H14.3484V7.83652H14.1742V9.8269H16.5258V7.83652H16.3516V9.65383Z" />
-                        <path d="M14.5225 6.01934V7.66357H14.6967V7.4905H14.8186V7.66357H14.9928V6.01934H14.8186V7.31742H14.6967V6.01934H14.5225Z" />
-                        <path d="M14.1742 5.67319V7.66357H14.3484V5.84627H16.3516V7.66357H16.5258V5.67319H14.1742Z" />
-                        <path d="M15.707 9.48071H15.8812V9.28084L16.0032 9.4807V9.48071H16.1774V7.83648H16.0032V9.14683L15.8812 8.94697V7.83648H15.707V9.48071Z" />
-                        <path d="M15.5852 6.01931H15.1149V6.19238H15.5852V6.01931Z" />
-                        <path d="M15.707 6.01934V7.66357H15.8812V7.46371L16.0032 7.66357H16.1774V6.01934H16.0032V7.32969L15.8812 7.12984V6.01934H15.707Z" />
-                        <path d="M15.411 7.31742H15.2891V6.53857H15.411V7.31742ZM15.1149 7.66357H15.2891V7.4905H15.411V7.66357H15.5852V6.3655H15.1149V7.66357Z" />
-                        <path d="M14.5225 8.69756L14.8186 9.18291V9.30763H14.6967V9.13455H14.5225V9.48071H14.9928V9.13456V9.13455L14.6967 8.64917V8.00956H14.8186V8.6586H14.9928V7.83648H14.5225V8.69756Z" />
-                        <path d="M15.411 9.30763H15.2891V8.00956H15.411V9.30763ZM15.1149 9.48071H15.5852V7.83648H15.1149V9.48071Z" />
-                            </g>
-                        </svg>
-                        {/* Áo phần 2 (second) */}
-                        <svg className="second" viewBox="0 0 24 24">
-                               <path d="M4.99997 3L8.99997 1.5C8.99997 1.5 10.6901 3 12 3C13.3098 3 15 1.5 15 1.5L19 3L22.5 8L19.5 10.5L19 9.5L17.1781 18.6093C17.062 19.1901 16.778 19.7249 16.3351 20.1181C15.4265 20.925 13.7133 22.3147 12 23C10.2868 22.3147 8.57355 20.925 7.66487 20.1181C7.22198 19.7249 6.93798 19.1901 6.82183 18.6093L4.99997 9.5L4.5 10.5L1.5 8L4.99997 3Z" />
-                            {/* Logo Group (lặp lại) */}
-                            <g>
-                                <path d="M16.3516 9.65383H14.3484V7.83652H14.1742V9.8269H16.5258V7.83652H16.3516V9.65383Z" />
-                        <path d="M14.5225 6.01934V7.66357H14.6967V7.4905H14.8186V7.66357H14.9928V6.01934H14.8186V7.31742H14.6967V6.01934H14.5225Z" />
-                        <path d="M14.1742 5.67319V7.66357H14.3484V5.84627H16.3516V7.66357H16.5258V5.67319H14.1742Z" />
-                        <path d="M15.707 9.48071H15.8812V9.28084L16.0032 9.4807V9.48071H16.1774V7.83648H16.0032V9.14683L15.8812 8.94697V7.83648H15.707V9.48071Z" />
-                        <path d="M15.5852 6.01931H15.1149V6.19238H15.5852V6.01931Z" />
-                        <path d="M15.707 6.01934V7.66357H15.8812V7.46371L16.0032 7.66357H16.1774V6.01934H16.0032V7.32969L15.8812 7.12984V6.01934H15.707Z" />
-                        <path d="M15.411 7.31742H15.2891V6.53857H15.411V7.31742ZM15.1149 7.66357H15.2891V7.4905H15.411V7.66357H15.5852V6.3655H15.1149V7.66357Z" />
-                        <path d="M14.5225 8.69756L14.8186 9.18291V9.30763H14.6967V9.13455H14.5225V9.48071H14.9928V9.13456V9.13455L14.6967 8.64917V8.00956H14.8186V8.6586H14.9928V7.83648H14.5225V8.69756Z" />
-                        <path d="M15.411 9.30763H15.2891V8.00956H15.411V9.30763ZM15.1149 9.48071H15.5852V7.83648H15.1149V9.48071Z" />
-                            </g>
-                        </svg>
-                    </div>
-                    
-                    {/* Icon Giỏ hàng (dùng chung cho tất cả các nút) */}
-                    <svg className="cart" viewBox="0 0 36 26">
-                        {/* Cart body (stroke) */}
-                       <path d="M1 2.5H6L10 18.5H25.5L28.5 7.5L7.5 7.5" className="shape" />
-                    <path d="M11.5 25C12.6046 25 13.5 24.1046 13.5 23C13.5 21.8954 12.6046 21 11.5 21C10.3954 21 9.5 21.8954 9.5 23C9.5 24.1046 10.3954 25 11.5 25Z" className="wheel" />
-                    <path d="M24 25C25.1046 25 26 24.1046 26 23C26 21.8954 25.1046 21 24 21C22.8954 21 22 21.8954 22 23C22 24.1046 22.8954 25 24 25Z" className="wheel" />
-                    <path d="M14.5 13.5L16.5 15.5L21.5 10.5" className="tick" />
+                    <svg className="morph" viewBox="0 0 64 13">
+                      <path d="M0 12C6 12 17 12 32 12C47.9024 12 58 12 64 12V13H0V12Z" />
                     </svg>
-
+                    <div className="shirt">
+                      <svg className="first" viewBox="0 0 24 24">
+                        <path d="M4.99997 3L8.99997 1.5C8.99997 1.5 10.6901 3 12 3C13.3098 3 15 1.5 15 1.5L19 3L22.5 8L19.5 10.5L19 9.5L17.1781 18.6093C17.062 19.1901 16.778 19.7249 16.3351 20.1181C15.4265 20.925 13.7133 22.3147 12 23C10.2868 22.3147 8.57355 20.925 7.66487 20.1181C7.22198 19.7249 6.93798 19.1901 6.82183 18.6093L4.99997 9.5L4.5 10.5L1.5 8L4.99997 3Z" />
+                        <g>
+                          <path d="M16.3516 9.65383H14.3484V7.83652H14.1742V9.8269H16.5258V7.83652H16.3516V9.65383Z" />
+                          <path d="M14.5225 6.01934V7.66357H14.6967V7.4905H14.8186V7.66357H14.9928V6.01934H14.8186V7.31742H14.6967V6.01934H14.5225Z" />
+                          <path d="M14.1742 5.67319V7.66357H14.3484V5.84627H16.3516V7.66357H16.5258V5.67319H14.1742Z" />
+                          <path d="M15.707 9.48071H15.8812V9.28084L16.0032 9.4807V9.48071H16.1774V7.83648H16.0032V9.14683L15.8812 8.94697V7.83648H15.707V9.48071Z" />
+                          <path d="M15.5852 6.01931H15.1149V6.19238H15.5852V6.01931Z" />
+                          <path d="M15.707 6.01934V7.66357H15.8812V7.46371L16.0032 7.66357H16.1774V6.01934H16.0032V7.32969L15.8812 7.12984V6.01934H15.707Z" />
+                          <path d="M15.411 7.31742H15.2891V6.53857H15.411V7.31742ZM15.1149 7.66357H15.2891V7.4905H15.411V7.66357H15.5852V6.3655H15.1149V7.66357Z" />
+                          <path d="M14.5225 8.69756L14.8186 9.18291V9.30763H14.6967V9.13455H14.5225V9.48071H14.9928V9.13456V9.13455L14.6967 8.64917V8.00956H14.8186V8.6586H14.9928V7.83648H14.5225V8.69756Z" />
+                          <path d="M15.411 9.30763H15.2891V8.00956H15.411V9.30763ZM15.1149 9.48071H15.5852V7.83648H15.1149V9.48071Z" />
+                        </g>
+                      </svg>
+                      <svg className="second" viewBox="0 0 24 24">
+                        <path d="M4.99997 3L8.99997 1.5C8.99997 1.5 10.6901 3 12 3C13.3098 3 15 1.5 15 1.5L19 3L22.5 8L19.5 10.5L19 9.5L17.1781 18.6093C17.062 19.1901 16.778 19.7249 16.3351 20.1181C15.4265 20.925 13.7133 22.3147 12 23C10.2868 22.3147 8.57355 20.925 7.66487 20.1181C7.22198 19.7249 6.93798 19.1901 6.82183 18.6093L4.99997 9.5L4.5 10.5L1.5 8L4.99997 3Z" />
+                        <g>
+                          <path d="M16.3516 9.65383H14.3484V7.83652H14.1742V9.8269H16.5258V7.83652H16.3516V9.65383Z" />
+                          <path d="M14.5225 6.01934V7.66357H14.6967V7.4905H14.8186V7.66357H14.9928V6.01934H14.8186V7.31742H14.6967V6.01934H14.5225Z" />
+                          <path d="M14.1742 5.67319V7.66357H14.3484V5.84627H16.3516V7.66357H16.5258V5.67319H14.1742Z" />
+                          <path d="M15.707 9.48071H15.8812V9.28084L16.0032 9.4807V9.48071H16.1774V7.83648H16.0032V9.14683L15.8812 8.94697V7.83648H15.707V9.48071Z" />
+                          <path d="M15.5852 6.01931H15.1149V6.19238H15.5852V6.01931Z" />
+                          <path d="M15.707 6.01934V7.66357H15.8812V7.46371L16.0032 7.66357H16.1774V6.01934H16.0032V7.32969L15.8812 7.12984V6.01934H15.707Z" />
+                          <path d="M15.411 7.31742H15.2891V6.53857H15.411V7.31742ZM15.1149 7.66357H15.2891V7.4905H15.411V7.66357H15.5852V6.3655H15.1149V7.66357Z" />
+                          <path d="M14.5225 8.69756L14.8186 9.18291V9.30763H14.6967V9.13455H14.5225V9.48071H14.9928V9.13456V9.13455L14.6967 8.64917V8.00956H14.8186V8.6586H14.9928V7.83648H14.5225V8.69756Z" />
+                          <path d="M15.411 9.30763H15.2891V8.00956H15.411V9.30763ZM15.1149 9.48071H15.5852V7.83648H15.1149V9.48071Z" />
+                        </g>
+                      </svg>
+                    </div>
+                    <svg className="cart" viewBox="0 0 36 26">
+                      <path d="M1 2.5H6L10 18.5H25.5L28.5 7.5L7.5 7.5" className="shape" />
+                      <path d="M11.5 25C12.6046 25 13.5 24.1046 13.5 23C13.5 21.8954 12.6046 21 11.5 21C10.3954 21 9.5 21.8954 9.5 23C9.5 24.1046 10.3954 25 11.5 25Z" className="wheel" />
+                      <path d="M24 25C25.1046 25 26 24.1046 26 23C26 21.8954 25.1046 21 24 21C22.8954 21 22 21.8954 22 23C22 24.1046 22.8954 25 24 25Z" className="wheel" />
+                      <path d="M14.5 13.5L16.5 15.5L21.5 10.5" className="tick" />
+                    </svg>
                   </button>
-                  {/* END: Nút Thêm vào giỏ đã được làm sạch */}
-
                 </div>
               ))}
             </div>
-          </section>
-          </div>
-        );
-      })}
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-10 text-center text-slate-500">
+              <p>Không tìm thấy sản phẩm phù hợp. Thử thay đổi bộ lọc hoặc từ khóa.</p>
+            </div>
+          )}
+
+          {paginatedProducts.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center pt-2">
+              <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm font-medium text-slate-600 disabled:text-slate-300"
+                >
+                  Trước
+                </button>
+                {pageNumbers.map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                      currentPage === page
+                        ? "bg-indigo-600 text-white"
+                        : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm font-medium text-slate-600 disabled:text-slate-300"
+                >
+                  Sau
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
     </div>
   );
