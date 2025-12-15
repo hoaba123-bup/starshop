@@ -76,6 +76,7 @@ app.use(
         "https://starshopps.vercel.app",
         "https://starsshops.vercel.app",
         "https://starsshopss.vercel.app",
+        "https://sstarshops.vercel.app",
 
       "http://localhost:5177",
     ],
